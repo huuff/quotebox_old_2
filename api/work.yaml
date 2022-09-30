@@ -1,0 +1,26 @@
+Work:
+  type: object
+  description: A work of literature
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier for a work
+      example: 1ab0828a-d97f-44b2-9700-7ef8b46248ce
+    name:
+      type: string
+      description: Name of the work
+      example: "Thus Spoke Zarathustra"
+    author:
+      type: string
+      description: Name of the author
+      example: "Friedrich Nietzsche"
+    tags:
+      type: array
+      description: Tags associated to this user
+      items:
+        type: string
+  required:
+    - id
+    - name
+    - author

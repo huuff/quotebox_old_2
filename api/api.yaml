@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: Quote API
+  description: Quote API
+  version: 0.1.0
+paths:
+  /quote/random:
+    get:
+      summary: Get a random quote
+      description: Get a random quote
+      operationId: v1Random
+      parameters:
+        - in: query
+          name: author
+          schema:
+            type: string
+        - in: query
+          name: tags
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A random quote
+          content:
+            application/json:
+              schema:
+                $ref: ./quote.yaml#Quote
+  /quote/{id}:
+    get:
+      summary: Get a specific quote
+      description: Get a specific quote by its ID
+      operationId: v1GetQuote
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: The requested quote
+          content:
+            application/json:
+              schema:
+                $ref: ./quote.yaml#Quote
+

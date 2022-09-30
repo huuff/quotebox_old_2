@@ -1,0 +1,30 @@
+Quote:
+  type: object
+  description: A quote
+  properties:
+    id: 
+      type: string
+      format: uuid
+      description: Unique identifier of a quote
+      example: 20b59066-b08f-4312-b906-ca07524a1bce
+    author:
+      type: string
+      description: Author of the quote
+      example: Friedrich Nietzsche
+    work:
+      type: string
+      description: Originating work of the quote
+      example: "Thus Spoke Zarathustra"
+    text:
+      type: string
+      description: Contents of quote
+      example: "This is a quote"
+    tags:
+      type: array
+      description: Tags associated to the quote
+      items:
+        type: string
+  required:
+    - id
+    - author
+    - text

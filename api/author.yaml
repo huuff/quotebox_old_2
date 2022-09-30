@@ -1,0 +1,16 @@
+Author:
+  type: object
+  description: An author
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique identifier of the author
+      example: a581eb3f-2ff3-4b51-a177-7faa199abae7
+    name:
+      type: string
+      description: Name of the author
+      example: Friedrich Nietzsche
+  required:
+    - id
+    - name
