@@ -6,7 +6,7 @@ import java.util.*
 
 @Document
 data class QuoteEntity(
-    @Id var id: UUID? = null,
+    @Id var id: String? = null,
     var author: String,
     var text: String,
     var work: String? = null,

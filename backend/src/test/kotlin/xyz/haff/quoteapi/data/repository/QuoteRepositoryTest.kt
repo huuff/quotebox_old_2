@@ -10,6 +10,7 @@ import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import xyz.haff.quoteapi.data.entity.QuoteEntity
+import java.util.*
 
 
 // TODO: Hmmm why does it pick the SampleBean but not the QuoteRepository?
@@ -17,7 +18,7 @@ import xyz.haff.quoteapi.data.entity.QuoteEntity
 // TODO: Use DataMongoTest, maybe exclude embedded mongo
 @SpringBootTest
 class QuoteRepositoryTest : FunSpec() {
-    @Autowired
+    @Autowired // TODO: try to add it from constructor
     private lateinit var quoteRepository: QuoteRepository
 
     companion object {
@@ -41,7 +42,7 @@ class QuoteRepositoryTest : FunSpec() {
 
             // TODO: Try to use coroutines
             val savedQuote = quoteRepository.save(quote).block()!!
-            val retrievedQuote = quoteRepository.findById(savedQuote.id!!).block()
+            val retrievedQuote = quoteRepository.findById(savedQuote.id!!).block()!!
 
             retrievedQuote shouldBe savedQuote
         }
