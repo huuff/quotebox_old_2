@@ -1,19 +1,14 @@
 package xyz.haff.quoteapi.data.repository
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.stereotype.Component
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import xyz.haff.quoteapi.data.SampleBean
 import xyz.haff.quoteapi.data.entity.QuoteEntity
 
 
@@ -22,11 +17,8 @@ import xyz.haff.quoteapi.data.entity.QuoteEntity
 // TODO: Use DataMongoTest, maybe exclude embedded mongo
 @SpringBootTest
 class QuoteRepositoryTest : FunSpec() {
-    //@Autowired
-    private lateinit var quoteRepository: QuoteRepository
-
     @Autowired
-    private lateinit var sampleBean: SampleBean
+    private lateinit var quoteRepository: QuoteRepository
 
     companion object {
         // TODO: specific version or digest
@@ -44,7 +36,7 @@ class QuoteRepositoryTest : FunSpec() {
     }
 
     init {
-        xtest("can save and retrieve an entity") {
+        test("can save and retrieve an entity") {
             val quote = QuoteEntity(author = "Author", text = "Text")
 
             // TODO: Try to use coroutines
@@ -52,10 +44,6 @@ class QuoteRepositoryTest : FunSpec() {
             val retrievedQuote = quoteRepository.findById(savedQuote.id!!).block()
 
             retrievedQuote shouldBe savedQuote
-        }
-
-        test("testing sample bean") {
-            sampleBean.run()
         }
     }
 }
