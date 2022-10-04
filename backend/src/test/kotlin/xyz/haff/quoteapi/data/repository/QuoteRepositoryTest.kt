@@ -10,6 +10,7 @@ import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import xyz.haff.quoteapi.data.entity.QuoteEntity
+import xyz.haff.quoteapi.testing.TestMongoDatabase
 
 
 @Testcontainers
@@ -19,17 +20,10 @@ class QuoteRepositoryTest : FunSpec() {
     private lateinit var quoteRepository: QuoteRepository
 
     companion object {
-        // TODO: specific version or digest
-        @JvmStatic
-        @Container
-        val container = MongoDBContainer("mongo:focal").apply {
-            this.start()
-        }
-
         @JvmStatic
         @DynamicPropertySource
         fun mongoProperties(registry: DynamicPropertyRegistry) {
-            registry.add("spring.data.mongodb.uri") { container.replicaSetUrl }
+            registry.add("spring.data.mongodb.uri") { TestMongoDatabase.container.replicaSetUrl }
         }
     }
 
