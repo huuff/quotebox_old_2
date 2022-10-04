@@ -12,7 +12,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import xyz.haff.quoteapi.data.entity.QuoteEntity
 
 
-// TODO: Hmmm why does it pick the SampleBean but not the QuoteRepository?
 @Testcontainers
 @DataMongoTest
 class QuoteRepositoryTest : FunSpec() {
