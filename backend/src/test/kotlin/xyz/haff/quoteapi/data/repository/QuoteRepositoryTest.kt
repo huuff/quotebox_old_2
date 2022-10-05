@@ -10,22 +10,16 @@ import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import xyz.haff.quoteapi.data.entity.QuoteEntity
+import xyz.haff.quoteapi.testing.MongoContainerTest
 import xyz.haff.quoteapi.testing.TestMongoDatabase
 
 
 @Testcontainers
 @DataMongoTest
+@MongoContainerTest
 class QuoteRepositoryTest : FunSpec() {
     @Autowired // TODO: try to add it from constructor
     private lateinit var quoteRepository: QuoteRepository
-
-    companion object {
-        @JvmStatic
-        @DynamicPropertySource
-        fun mongoProperties(registry: DynamicPropertyRegistry) {
-            registry.add("spring.data.mongodb.uri") { TestMongoDatabase.container.replicaSetUrl }
-        }
-    }
 
     init {
         test("can save and retrieve an entity") {
