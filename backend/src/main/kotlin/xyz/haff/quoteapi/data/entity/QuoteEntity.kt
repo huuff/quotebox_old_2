@@ -3,12 +3,11 @@ package xyz.haff.quoteapi.data.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
-
-@Document
+@Document(collection = "quotes")
 data class QuoteEntity(
     @Id var id: String? = null,
-    var author: String,
     var text: String,
+    var author: String,
     var work: String? = null,
     var tags: List<String> = listOf(),
 )

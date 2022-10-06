@@ -24,7 +24,7 @@ class MongoContainerContextCustomizerFactory : ContextCustomizerFactory {
             mergedConfig: MergedContextConfiguration
         ) {
             // TODO: Specific digest
-            // TODO: Is this container actually shared across all tests?
+            // TODO: Is this container actually shared across all tests? Found my answer: No
             val mongoContainer = MongoDBContainer("mongo:focal").apply { this.start() }
             context.environment.propertySources.addFirst(MapPropertySource("MongoDB Testcontainer Properties",
                 mapOf("spring.data.mongodb.uri" to mongoContainer.replicaSetUrl)
