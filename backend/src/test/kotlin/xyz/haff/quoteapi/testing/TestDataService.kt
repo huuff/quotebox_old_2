@@ -1,5 +1,6 @@
 package xyz.haff.quoteapi.testing
 
+import io.kotest.core.spec.style.FunSpec
 import kotlinx.coroutines.reactive.awaitLast
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -26,3 +27,4 @@ class TestDataService(
         repository.deleteAll().awaitSingleOrNull()
     }
 }
+

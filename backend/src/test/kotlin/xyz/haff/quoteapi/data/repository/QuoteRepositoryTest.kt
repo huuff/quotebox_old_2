@@ -5,26 +5,29 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
+import org.springframework.context.annotation.Import
 import org.testcontainers.junit.jupiter.Testcontainers
 import xyz.haff.quoteapi.data.entity.QuoteEntity
+import xyz.haff.quoteapi.testing.FunSpecWithTestData
 import xyz.haff.quoteapi.testing.MongoContainerTest
+import xyz.haff.quoteapi.testing.TestDataService
 
 
 @Testcontainers
 @DataMongoTest
+@Import(TestDataService::class)
 @MongoContainerTest
-class QuoteRepositoryTest : FunSpec() {
-    @Autowired // TODO: try to add it from constructor
-    private lateinit var quoteRepository: QuoteRepository
+class QuoteRepositoryTest(
+    private val quoteRepository: QuoteRepository,
+    testDataService: TestDataService,
+) : FunSpecWithTestData(testDataService, {
 
-    init {
-        test("can save and retrieve an entity") {
-            val quote = QuoteEntity(author = "Author", text = "Text")
+    test("can save and retrieve an entity") {
+        val quote = QuoteEntity(author = "Author", text = "Text")
 
-            val savedQuote = quoteRepository.save(quote).awaitSingle()
-            val retrievedQuote = quoteRepository.findById(savedQuote.id!!).awaitSingle()
+        val savedQuote = quoteRepository.save(quote).awaitSingle()
+        val retrievedQuote = quoteRepository.findById(savedQuote.id!!).awaitSingle()
 
-            retrievedQuote shouldBe savedQuote
-        }
+        retrievedQuote shouldBe savedQuote
     }
-}
+})
