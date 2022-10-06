@@ -15,6 +15,13 @@ repositories {
     mavenCentral()
 }
 
+configurations.all {
+    resolutionStrategy {
+        // XXX: The testcontainers bom brings in SLF4J 2.0.0, which conflicts with Spring's 1.7.36 and tests stop logging.
+        force("org.slf4j:slf4j-api:1.7.36")
+    }
+}
+
 dependencies {
     val kotlinxCoroutinesVersion = "1.6.4"
     val kotestVersion = "5.4.2"
