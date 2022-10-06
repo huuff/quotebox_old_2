@@ -77,7 +77,7 @@ openApiGenerate {
     configOptions.set(
         mapOf(
             "dateLibrary" to "java8",
-            "serializationLibrary" to "jackson", // TODO: I want to use moshi but this doesn't seem to detect anything
+            "serializationLibrary" to "jackson",
             "enumPropertyNaming" to "UPPERCASE",
             "reactive" to "true",
             "interfaceOnly" to "true",
