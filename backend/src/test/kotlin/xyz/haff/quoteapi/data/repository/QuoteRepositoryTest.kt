@@ -2,6 +2,7 @@ package xyz.haff.quoteapi.data.repository
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -20,9 +21,8 @@ class QuoteRepositoryTest : FunSpec() {
         test("can save and retrieve an entity") {
             val quote = QuoteEntity(author = "Author", text = "Text")
 
-            // TODO: Try to use coroutines
-            val savedQuote = quoteRepository.save(quote).block()!!
-            val retrievedQuote = quoteRepository.findById(savedQuote.id!!).block()!!
+            val savedQuote = quoteRepository.save(quote).awaitSingle()
+            val retrievedQuote = quoteRepository.findById(savedQuote.id!!).awaitSingle()
 
             retrievedQuote shouldBe savedQuote
         }

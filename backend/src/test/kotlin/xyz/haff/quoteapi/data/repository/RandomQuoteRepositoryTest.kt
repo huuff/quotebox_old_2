@@ -2,6 +2,7 @@ package xyz.haff.quoteapi.data.repository
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.context.annotation.Import
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -20,8 +21,8 @@ class RandomQuoteRepositoryTest(
     test("getOne") {
         val sampleQuote = QuoteEntity("test", "test", "test")
 
-        quoteRepository.save(sampleQuote).block()
+        quoteRepository.save(sampleQuote).awaitSingle()
 
-        randomQuoteRepository.getOne().block()!! shouldBe sampleQuote
+        randomQuoteRepository.getOne().awaitSingle() shouldBe sampleQuote
     }
 })

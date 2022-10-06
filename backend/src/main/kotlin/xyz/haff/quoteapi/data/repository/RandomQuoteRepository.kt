@@ -11,7 +11,6 @@ import xyz.haff.quoteapi.data.entity.QuoteEntity
 class RandomQuoteRepository(
     private val mongoTemplate: ReactiveMongoTemplate,
 ) {
-
     fun getOne(): Mono<QuoteEntity> = mongoTemplate.aggregate(
         Aggregation.newAggregation(
             Aggregation.sample(1)
