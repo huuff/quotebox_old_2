@@ -1,6 +1,8 @@
 plugins {
     val kotlinVersion = "1.7.20"
     kotlin("jvm") version kotlinVersion
+    kotlin("kapt") version kotlinVersion
+
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.springframework.boot") version "2.7.4"
@@ -25,9 +27,13 @@ configurations.all {
 dependencies {
     val kotlinxCoroutinesVersion = "1.6.4"
     val kotestVersion = "5.4.2"
+    val mapStructVersion = "1.5.2.Final"
     
     implementation(platform("org.springframework.boot:spring-boot-dependencies:2.7.4"))
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.17.4"))
+
+    implementation("org.mapstruct:mapstruct:$mapStructVersion")
+    kapt("org.mapstruct:mapstruct-processor:$mapStructVersion")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -74,6 +80,7 @@ openApiGenerate {
     outputDir.set(apiGeneratedSourcesDir)
     apiPackage.set("xyz.haff.quoteapi.controller")
     modelPackage.set("xyz.haff.quoteapi.dto")
+    modelNameSuffix.set("Dto")
     configOptions.set(
         mapOf(
             "dateLibrary" to "java8",
