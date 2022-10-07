@@ -4,12 +4,13 @@ import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.RandomQuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 
-@Controller
+@RestController
 class QuoteApiController(
     private val randomQuoteRepository: RandomQuoteRepository,
     private val quoteRepository: QuoteRepository,
