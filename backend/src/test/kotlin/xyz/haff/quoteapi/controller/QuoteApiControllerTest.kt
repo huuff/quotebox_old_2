@@ -19,6 +19,7 @@ import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.RandomQuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
+import xyz.haff.quoteapi.testing.TestData
 
 // TODO: Finish it (but first make it work)
 @WebFluxTest(QuoteApiController::class)
@@ -29,26 +30,17 @@ class QuoteApiControllerTest(
     @MockkBean private val quoteMapper: QuoteMapper,
     private val objectMapper: ObjectMapper
 ) : FunSpec({
-    val mockQuoteEntity = mockk<QuoteEntity> {
-        every { id } returns "test"
-    }
-    val responseDto = QuoteDto(
-        id = "id",
-        author = "author",
-        text = "text",
-        work = "work",
-        tags = listOf("tag1", "tag2", "tag3")
-    )
+    val (entity, dto) = TestData.random
 
     context("v1GetQuote") {
         test("200 OK") {
             // ARRANGE
-            // TODO: Use the exact types instead of any
-            every { quoteRepository.findById(any<String>()) } returns Mono.just(mockQuoteEntity)
-            every { quoteMapper.quoteEntityToQuoteDto(any())} returns responseDto
+            every { quoteRepository.findById(any<String>()) } returns Mono.just(entity)
+            every { quoteMapper.quoteEntityToQuoteDto(any())} returns dto
 
+            // ACT
             val response = webClient.get()
-                .uri("/quote/${mockQuoteEntity.id}")
+                .uri("/quote/${entity.id}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk
@@ -56,12 +48,17 @@ class QuoteApiControllerTest(
                 .returnResult()
                 .responseBody!!
 
-            response shouldBe responseDto
+            // ASSERT
+            response shouldBe dto
         }
 
-        test("404 Not Found")
+        test("404 Not Found") {
+
+        }
     }
 
-    test("v1Random")
+    test("v1Random") {
+
+    }
 
 })
