@@ -74,6 +74,7 @@ dependencies {
 }
 
 val apiGeneratedSourcesDir = "$buildDir/generated-sources/api"
+// TODO: I'm sure this doesn't do appropriate up-to-date checking
 openApiGenerate {
     generatorName.set("kotlin-spring")
     inputSpec.set("$projectDir/../api/api.yaml") // TODO: From properties?

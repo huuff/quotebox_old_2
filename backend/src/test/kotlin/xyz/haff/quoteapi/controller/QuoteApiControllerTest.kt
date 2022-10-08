@@ -1,6 +1,5 @@
 package xyz.haff.quoteapi.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -20,13 +19,13 @@ class QuoteApiControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val quoteMapper: QuoteMapper,
-    private val objectMapper: ObjectMapper
 ) : FunSpec({
     val (entity, dto) = TestData.random
 
     context("v1GetQuote") {
         test("200 OK") {
             // ARRANGE
+            // TODO: Use specific id
             every { quoteRepository.findById(any<String>()) } returns Mono.just(entity)
             every { quoteMapper.quoteEntityToQuoteDto(any())} returns dto
 
@@ -45,7 +44,15 @@ class QuoteApiControllerTest(
         }
 
         test("404 Not Found") {
+            // ARRANGE
+            every { quoteRepository.findById(any<String>()) } returns Mono.empty()
 
+            // ACT & ASSERT
+            webClient.get()
+                .uri("/quote/${entity.id}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound
         }
     }
 
