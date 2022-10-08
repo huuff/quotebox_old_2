@@ -74,8 +74,10 @@ dependencies {
     testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
 }
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.plusAssign("-Amapstruct.defaultComponentModel=spring")
+kapt {
+    arguments {
+        arg("mapstruct.defaultComponentModel", "spring")
+    }
 }
 
 val apiGeneratedSourcesDir = "$buildDir/generated-sources/api"
@@ -103,8 +105,10 @@ tasks.test {
 }
 
 tasks.compileKotlin {
-    kotlinOptions.jvmTarget = "17"
     dependsOn(tasks.openApiGenerate)
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 sourceSets["main"].java.srcDir(file("$apiGeneratedSourcesDir/src/main/kotlin"))
