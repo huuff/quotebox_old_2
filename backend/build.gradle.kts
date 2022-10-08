@@ -28,6 +28,7 @@ dependencies {
     val kotlinxCoroutinesVersion = "1.6.4"
     val kotestVersion = "5.4.2"
     val mapStructVersion = "1.5.2.Final"
+    val springdocVersion = "1.6.11"
     
     implementation(platform("org.springframework.boot:spring-boot-dependencies:2.7.4"))
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.17.4"))
@@ -40,7 +41,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxCoroutinesVersion")
-    implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.11")
+    implementation("org.springdoc:springdoc-openapi-webflux-ui:$springdocVersion")
+    implementation("org.springdoc:springdoc-openapi-kotlin:$springdocVersion")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
