@@ -6,7 +6,7 @@ import xyz.haff.quoteapi.data.entity.QuoteEntity
 import xyz.haff.quoteapi.dto.QuoteDto
 
 @Component
-@Mapper
+@Mapper(componentModel = "spring")
 interface QuoteMapper {
     fun quoteEntityToQuoteDto(entity: QuoteEntity): QuoteDto
 }

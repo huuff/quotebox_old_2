@@ -43,6 +43,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.11")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
@@ -71,6 +72,10 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
 
     testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.plusAssign("-Amapstruct.defaultComponentModel=spring")
 }
 
 val apiGeneratedSourcesDir = "$buildDir/generated-sources/api"
