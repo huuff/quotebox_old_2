@@ -18,7 +18,7 @@ object TestData {
 
     data class EntityAndDto(val entity: QuoteEntity, val dto: QuoteDto)
     val random get(): EntityAndDto {
-        val index = (0 until entities.size).random()
+        val index = entities.indices.random()
 
         return EntityAndDto(
             entity = entities[index],
