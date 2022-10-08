@@ -3,16 +3,13 @@ package xyz.haff.quoteapi.controller
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
-import xyz.haff.quoteapi.data.repository.RandomQuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 
 @RestController
 class QuoteApiController(
-    private val randomQuoteRepository: RandomQuoteRepository,
     private val quoteRepository: QuoteRepository,
     private val quoteMapper: QuoteMapper,
 ) : QuoteApi {
@@ -25,7 +22,7 @@ class QuoteApiController(
 
     override suspend fun v1Random(author: String?, tags: List<String>?): ResponseEntity<QuoteDto> {
         return ResponseEntity.ok(
-            quoteMapper.quoteEntityToQuoteDto(randomQuoteRepository.getOne().awaitSingle())
+            quoteMapper.quoteEntityToQuoteDto(quoteRepository.getRandom().awaitSingle())
         )
     }
 }
