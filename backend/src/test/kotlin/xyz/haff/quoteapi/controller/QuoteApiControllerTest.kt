@@ -7,6 +7,7 @@ import io.mockk.every
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.Mono
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
@@ -35,9 +36,8 @@ class QuoteApiControllerTest(
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk
-                .expectBody(QuoteDto::class.java)
-                .returnResult()
-                .responseBody!!
+                .returnResult<QuoteDto>()
+                .responseBody
 
             // ASSERT
             response shouldBe dto
@@ -57,7 +57,7 @@ class QuoteApiControllerTest(
     }
 
     test("v1Random") {
-
+        // TODO
     }
 
 })

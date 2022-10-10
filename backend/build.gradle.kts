@@ -29,6 +29,7 @@ dependencies {
     val kotestVersion = "5.4.2"
     val mapStructVersion = "1.5.2.Final"
     val springdocVersion = "1.6.11"
+    val koyVersion = "0.6.0"
     
     implementation(platform("org.springframework.boot:spring-boot-dependencies:2.7.4"))
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.17.4"))
@@ -46,6 +47,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("xyz.haff:koy:$koyVersion")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
@@ -62,6 +65,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-json:$kotestVersion")
     testImplementation("io.mockk:mockk:1.13.2")
     testImplementation("com.ninja-squad:springmockk:3.1.1")
+    testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")

@@ -1,10 +1,10 @@
 package xyz.haff.quoteapi.controller
 
-import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
+import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 
@@ -21,8 +21,12 @@ class QuoteApiController(
     }
 
     override suspend fun v1Random(author: String?, tags: List<String>?): ResponseEntity<QuoteDto> {
-        return ResponseEntity.ok(
-            quoteMapper.quoteEntityToQuoteDto(quoteRepository.getRandom().awaitSingle())
-        )
+        val quoteEntity = try {
+            quoteRepository.chooseRandom(author, tags)
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().build()
+        }.awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
+
+        return ResponseEntity.ok(quoteMapper.quoteEntityToQuoteDto(quoteEntity))
     }
 }

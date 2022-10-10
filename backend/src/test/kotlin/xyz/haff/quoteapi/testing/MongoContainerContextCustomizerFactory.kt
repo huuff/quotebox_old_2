@@ -9,6 +9,7 @@ import org.springframework.test.context.ContextCustomizerFactory
 import org.springframework.test.context.MergedContextConfiguration
 import org.testcontainers.containers.MongoDBContainer
 
+private val container by lazy { MongoDBContainer("mongo:focal").apply { this.start() } }
 class MongoContainerContextCustomizerFactory : ContextCustomizerFactory {
 
     override fun createContextCustomizer(
@@ -18,16 +19,14 @@ class MongoContainerContextCustomizerFactory : ContextCustomizerFactory {
         MongoContainerTestContextCustomizer()
     } else { null }
 
-    private class MongoContainerTestContextCustomizer : ContextCustomizer {
+    private inner class MongoContainerTestContextCustomizer : ContextCustomizer {
         override fun customizeContext(
             context: ConfigurableApplicationContext,
             mergedConfig: MergedContextConfiguration
         ) {
             // TODO: Specific digest
-            // TODO: Is this container actually shared across all tests? Found my answer: No
-            val mongoContainer = MongoDBContainer("mongo:focal").apply { this.start() }
             context.environment.propertySources.addFirst(MapPropertySource("MongoDB Testcontainer Properties",
-                mapOf("spring.data.mongodb.uri" to mongoContainer.replicaSetUrl)
+                mapOf("spring.data.mongodb.uri" to container.replicaSetUrl)
             ))
         }
 
