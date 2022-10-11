@@ -18,15 +18,18 @@ class QuoteSseController(
     private val quoteMapper: QuoteMapper,
 ) {
 
-    // TODO: Test
     // TODO: Can I add it to the API? (Maybe AsyncAPI is the only choice)
+    // TODO: Return a quote for the first iteration?
+    // TODO: Defaults in the signature instead of the body?
     @GetMapping(path = ["/random"], produces = ["application/x-ndjson"])
     fun randomSSE(
         @RequestParam interval: Int? = null,
+        @RequestParam count: Long? = null, // XXX: Actually, I only added this because the QuoteSseControllerTest wouldn't work without it
         @RequestParam author: String? = null,
         @RequestParam tags: List<String>? = null
     ): Flux<QuoteDto> =
         Flux.interval((interval ?: 5000).millis)
+            .take(count ?: Long.MAX_VALUE)
             .flatMap { quoteRepository.chooseRandom(author, tags) }
             .map(quoteMapper::quoteEntityToQuoteDto)
 }

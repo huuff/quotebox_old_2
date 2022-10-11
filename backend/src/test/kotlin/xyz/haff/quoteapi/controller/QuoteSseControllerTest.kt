@@ -9,7 +9,9 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import xyz.haff.koy.javatime.hours
 import xyz.haff.koy.javatime.millis
+import xyz.haff.koy.javatime.seconds
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
@@ -38,6 +40,7 @@ class QuoteSseControllerTest(
             .uri {
                 it.path("/sse/quote/random")
                 it.queryParam("interval", 1)
+                it.queryParam("count", 3) // XXX: Won't work without it!
                 it.build()
             }
             .accept(MediaType.APPLICATION_NDJSON)
@@ -47,11 +50,14 @@ class QuoteSseControllerTest(
             .responseBody
 
         // ASSERT
-        StepVerifier.create(responses)
+        StepVerifier.withVirtualTime { responses.log().onBackpressureDrop() }
+            .expectSubscription()
+            .thenAwait(1.millis)
             .expectNext(TestData.dtos[0])
+            .thenAwait(1.millis)
             .expectNext(TestData.dtos[1])
+            .thenAwait(1.millis)
             .expectNext(TestData.dtos[2])
-            .expectComplete()
-            .verify()
+            .verifyComplete()
     }
 })
