@@ -9,14 +9,11 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import xyz.haff.koy.javatime.hours
 import xyz.haff.koy.javatime.millis
-import xyz.haff.koy.javatime.seconds
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.testing.TestData
-import java.time.Duration
 
 @WebFluxTest(QuoteSseController::class)
 class QuoteSseControllerTest(
