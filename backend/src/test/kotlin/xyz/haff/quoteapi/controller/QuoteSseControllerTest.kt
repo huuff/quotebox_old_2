@@ -49,7 +49,6 @@ class QuoteSseControllerTest(
         // ASSERT
         StepVerifier.withVirtualTime { responses.log().onBackpressureDrop() }
             .expectSubscription()
-            .thenAwait(1.millis)
             .expectNext(TestData.dtos[0])
             .thenAwait(1.millis)
             .expectNext(TestData.dtos[1])

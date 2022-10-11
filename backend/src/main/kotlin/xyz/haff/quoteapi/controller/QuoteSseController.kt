@@ -19,7 +19,6 @@ class QuoteSseController(
 ) {
 
     // TODO: Can I add it to the API? (Maybe AsyncAPI is the only choice)
-    // TODO: Return a quote for the first iteration?
     @GetMapping(path = ["/random"], produces = ["application/x-ndjson"])
     fun randomSSE(
         @RequestParam(required = false, defaultValue = "5000") interval: Int,
@@ -28,8 +27,12 @@ class QuoteSseController(
         @RequestParam(required = false) author: String?,
         @RequestParam(required = false) tags: List<String>?,
     ): Flux<QuoteDto> =
-        Flux.interval(interval.millis)
-            .take(count)
-            .flatMap { quoteRepository.chooseRandom(author, tags) }
+        quoteRepository
+            .chooseRandom(author, tags)
             .map(quoteMapper::quoteEntityToQuoteDto)
+            .concatWith(
+        Flux.interval(interval.millis)
+            .take((count - 1).coerceAtLeast(0))
+            .flatMap { quoteRepository.chooseRandom(author, tags) }
+            .map(quoteMapper::quoteEntityToQuoteDto))
 }
