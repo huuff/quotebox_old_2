@@ -29,10 +29,10 @@ class QuoteSseController(
     ): Flux<QuoteDto> =
         quoteRepository
             .chooseRandom(author, tags)
-            .map(quoteMapper::quoteEntityToQuoteDto)
+            .map(quoteMapper::entityToDto)
             .concatWith(
         Flux.interval(interval.millis)
             .take((count - 1).coerceAtLeast(0))
             .flatMap { quoteRepository.chooseRandom(author, tags) }
-            .map(quoteMapper::quoteEntityToQuoteDto))
+            .map(quoteMapper::entityToDto))
 }

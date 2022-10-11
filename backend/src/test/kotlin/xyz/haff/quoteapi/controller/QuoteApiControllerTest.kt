@@ -31,7 +31,7 @@ class QuoteApiControllerTest(
         test("200 OK") {
             // ARRANGE
             every { quoteRepository.findById(any<String>()) } returns Mono.just(entity)
-            every { quoteMapper.quoteEntityToQuoteDto(any())} returns dto
+            every { quoteMapper.entityToDto(any())} returns dto
 
             // ACT
             val response = webClient.get()
@@ -46,7 +46,7 @@ class QuoteApiControllerTest(
             // ASSERT
             response shouldBe dto
             verify { quoteRepository.findById(entity.id!!) }
-            verify { quoteMapper.quoteEntityToQuoteDto(entity) }
+            verify { quoteMapper.entityToDto(entity) }
         }
 
         test("404 Not Found") {
@@ -67,7 +67,7 @@ class QuoteApiControllerTest(
     test("v1Random") {
         // ARRANGE
         every { quoteRepository.getRandom() } returns Mono.just(entity)
-        every { quoteMapper.quoteEntityToQuoteDto(any())} returns dto
+        every { quoteMapper.entityToDto(any())} returns dto
 
         // ACT & ASSERT
         webClient.get()
@@ -77,7 +77,7 @@ class QuoteApiControllerTest(
             .expectStatus().isOk
 
         verify { quoteRepository.getRandom() }
-        verify { quoteMapper.quoteEntityToQuoteDto(entity) }
+        verify { quoteMapper.entityToDto(entity) }
     }
 
 })

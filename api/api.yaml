@@ -45,4 +45,17 @@ paths:
             application/json:
               schema:
                 $ref: quote.yaml#/Quote
-
+  /quote:
+    post:
+      summary: Add a new quote
+      description: Add a new quote
+      requestBody:
+        description: Quote to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: quote.yaml#/Quote
+      responses:
+        '201':
+          description: Created

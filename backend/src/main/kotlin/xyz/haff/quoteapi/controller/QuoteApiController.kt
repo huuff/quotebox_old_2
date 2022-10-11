@@ -7,6 +7,7 @@ import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
+import java.net.URI
 
 @RestController
 class QuoteApiController(
@@ -17,7 +18,7 @@ class QuoteApiController(
     override suspend fun v1GetQuote(id: String): ResponseEntity<QuoteDto> {
         val quote = quoteRepository.findById(id).awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
 
-        return ResponseEntity.ok(quoteMapper.quoteEntityToQuoteDto(quote))
+        return ResponseEntity.ok(quoteMapper.entityToDto(quote))
     }
 
     override suspend fun v1Random(author: String?, tags: List<String>?): ResponseEntity<QuoteDto> {
@@ -27,6 +28,17 @@ class QuoteApiController(
             return ResponseEntity.badRequest().build()
         }.awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
 
-        return ResponseEntity.ok(quoteMapper.quoteEntityToQuoteDto(quoteEntity))
+        return ResponseEntity.ok(quoteMapper.entityToDto(quoteEntity))
+    }
+
+    // TODO: Validations?
+    // TODO: Secure
+    // TODO: Test
+    // TODO: Operation name! (In the API)
+    override suspend fun quotePost(quoteDto: QuoteDto): ResponseEntity<Unit> {
+        val entity = quoteRepository.insert(quoteMapper.dtoToEntity(quoteDto))
+            .awaitSingleOrNull() ?: return ResponseEntity.internalServerError().build()
+
+        return ResponseEntity.created(URI.create("/quote/${entity.id}")).build()
     }
 }

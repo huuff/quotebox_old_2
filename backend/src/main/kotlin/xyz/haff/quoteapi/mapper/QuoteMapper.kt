@@ -6,5 +6,6 @@ import xyz.haff.quoteapi.dto.QuoteDto
 
 @Mapper
 interface QuoteMapper {
-    fun quoteEntityToQuoteDto(entity: QuoteEntity): QuoteDto
+    fun entityToDto(entity: QuoteEntity): QuoteDto
+    fun dtoToEntity(dto: QuoteDto): QuoteEntity
 }

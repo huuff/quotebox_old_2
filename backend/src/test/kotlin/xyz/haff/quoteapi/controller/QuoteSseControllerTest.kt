@@ -32,7 +32,7 @@ class QuoteSseControllerTest(
             quoteRepository.getRandom()
         } returns Mono.just(TestData.entities[0]) andThen Mono.just(TestData.entities[1]) andThen Mono.just(TestData.entities[2])
         every {
-            quoteMapper.quoteEntityToQuoteDto(any())
+            quoteMapper.entityToDto(any())
         } returns TestData.dtos[0] andThen TestData.dtos[1] andThen TestData.dtos[2]
 
         // ACT

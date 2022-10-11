@@ -31,8 +31,8 @@ class WebFluxSecurityConfig {
             authorizeExchange {
                 authorize(anyExchange, permitAll)
             }
-            formLogin { }
-            httpBasic { }
+            csrf { disable() } // TODO: Should I?
+            //httpBasic { }
         }
     }
 }
