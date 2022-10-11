@@ -7,16 +7,19 @@ import io.mockk.every
 import io.mockk.verify
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.Mono
+import xyz.haff.quoteapi.config.WebFluxSecurityConfig
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.testing.TestData
 
 @WebFluxTest(QuoteApiController::class)
+@Import(WebFluxSecurityConfig::class)
 class QuoteApiControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,

@@ -47,6 +47,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("xyz.haff:koy:$koyVersion")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 
@@ -70,6 +71,7 @@ dependencies {
         exclude(module = "junit")
         exclude(module = "mockito-core")
     }
+    testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinxCoroutinesVersion")
 
     testImplementation("org.testcontainers:mongodb")

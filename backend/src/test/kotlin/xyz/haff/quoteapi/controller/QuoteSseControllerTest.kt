@@ -4,18 +4,21 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import xyz.haff.koy.javatime.millis
+import xyz.haff.quoteapi.config.WebFluxSecurityConfig
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.testing.TestData
 
 @WebFluxTest(QuoteSseController::class)
+@Import(WebFluxSecurityConfig::class)
 class QuoteSseControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
@@ -47,6 +50,7 @@ class QuoteSseControllerTest(
             .responseBody
 
         // ASSERT
+        // TODO: Remove the log and the drop on backpressure
         StepVerifier.withVirtualTime { responses.log().onBackpressureDrop() }
             .expectSubscription()
             .expectNext(TestData.dtos[0])
