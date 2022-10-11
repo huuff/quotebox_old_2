@@ -50,8 +50,7 @@ class QuoteSseControllerTest(
             .responseBody
 
         // ASSERT
-        // TODO: Remove the log and the drop on backpressure
-        StepVerifier.withVirtualTime { responses.log().onBackpressureDrop() }
+        StepVerifier.withVirtualTime { responses }
             .expectSubscription()
             .expectNext(TestData.dtos[0])
             .thenAwait(1.millis)
