@@ -4,6 +4,8 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
+import io.mockk.verify
+import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -26,7 +28,6 @@ class QuoteApiControllerTest(
     context("v1GetQuote") {
         test("200 OK") {
             // ARRANGE
-            // TODO: Use specific id
             every { quoteRepository.findById(any<String>()) } returns Mono.just(entity)
             every { quoteMapper.quoteEntityToQuoteDto(any())} returns dto
 
@@ -38,9 +39,12 @@ class QuoteApiControllerTest(
                 .expectStatus().isOk
                 .returnResult<QuoteDto>()
                 .responseBody
+                .awaitSingle()
 
             // ASSERT
             response shouldBe dto
+            verify { quoteRepository.findById(entity.id!!) }
+            verify { quoteMapper.quoteEntityToQuoteDto(entity) }
         }
 
         test("404 Not Found") {
@@ -53,6 +57,8 @@ class QuoteApiControllerTest(
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound
+
+            verify { quoteRepository.findById(entity.id!!) }
         }
     }
 
