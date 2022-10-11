@@ -16,7 +16,6 @@ import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.testing.TestData
 
-// TODO: Finish it
 @WebFluxTest(QuoteApiController::class)
 class QuoteApiControllerTest(
     private val webClient: WebTestClient,
@@ -63,7 +62,19 @@ class QuoteApiControllerTest(
     }
 
     test("v1Random") {
-        // TODO
+        // ARRANGE
+        every { quoteRepository.getRandom() } returns Mono.just(entity)
+        every { quoteMapper.quoteEntityToQuoteDto(any())} returns dto
+
+        // ACT & ASSERT
+        webClient.get()
+            .uri("/quote/random")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+
+        verify { quoteRepository.getRandom() }
+        verify { quoteMapper.quoteEntityToQuoteDto(entity) }
     }
 
 })
