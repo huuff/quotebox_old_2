@@ -2,9 +2,6 @@ Quote:
   type: object
   description: A quote
   properties:
-    id: 
-      type: string
-      description: Unique identifier of a quote
     author:
       type: string
       description: Author of the quote

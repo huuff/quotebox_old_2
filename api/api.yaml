@@ -20,12 +20,12 @@ paths:
             items:
               type: string
       responses:
-        '200':
-          description: A random quote
-          content:
-            application/json:
+        '303':
+          description: Link to a random quote
+          headers:
+            Location:
               schema:
-                $ref: quote.yaml#/Quote
+                type: string
   /quote/{id}:
     get:
       summary: Get a specific quote

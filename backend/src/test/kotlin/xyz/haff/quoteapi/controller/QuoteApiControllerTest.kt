@@ -67,17 +67,17 @@ class QuoteApiControllerTest(
     test("v1Random") {
         // ARRANGE
         every { quoteRepository.getRandom() } returns Mono.just(entity)
-        every { quoteMapper.entityToDto(any())} returns dto
 
         // ACT & ASSERT
         webClient.get()
             .uri("/quote/random")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
-            .expectStatus().isOk
+            .expectStatus().isSeeOther
+            .expectHeader()
+            .location("/quote/${entity.id}")
 
         verify { quoteRepository.getRandom() }
-        verify { quoteMapper.entityToDto(entity) }
     }
 
 })
