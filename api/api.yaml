@@ -7,8 +7,7 @@ paths:
   /quote/random:
     get:
       summary: Get a random quote
-      description: Get a random quote
-      operationId: v1Random
+      operationId: v1RandomQuote
       parameters:
         - in: query
           name: author
@@ -30,7 +29,6 @@ paths:
   /quote/{id}:
     get:
       summary: Get a specific quote
-      description: Get a specific quote by its ID
       operationId: v1GetQuote
       parameters:
         - in: path
@@ -48,7 +46,7 @@ paths:
   /quote:
     post:
       summary: Add a new quote
-      description: Add a new quote
+      operationId: v1AddQuote
       requestBody:
         description: Quote to add
         required: true

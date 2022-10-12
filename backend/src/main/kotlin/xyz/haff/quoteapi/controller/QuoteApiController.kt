@@ -21,7 +21,7 @@ class QuoteApiController(
         return ResponseEntity.ok(quoteMapper.entityToDto(quote))
     }
 
-    override suspend fun v1Random(author: String?, tags: List<String>?): ResponseEntity<QuoteDto> {
+    override suspend fun v1RandomQuote(author: String?, tags: List<String>?): ResponseEntity<QuoteDto> {
         val quoteEntity = try {
             quoteRepository.chooseRandom(author, tags)
         } catch (e: IllegalArgumentException) {
@@ -34,8 +34,7 @@ class QuoteApiController(
     // TODO: Validations?
     // TODO: Secure
     // TODO: Test
-    // TODO: Operation name! (In the API)
-    override suspend fun quotePost(quoteDto: QuoteDto): ResponseEntity<Unit> {
+    override suspend fun v1AddQuote(quoteDto: QuoteDto): ResponseEntity<Unit> {
         val entity = quoteRepository.insert(quoteMapper.dtoToEntity(quoteDto))
             .awaitSingleOrNull() ?: return ResponseEntity.internalServerError().build()
 
