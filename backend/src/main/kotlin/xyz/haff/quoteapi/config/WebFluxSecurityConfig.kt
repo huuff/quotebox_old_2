@@ -2,6 +2,7 @@ package xyz.haff.quoteapi.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.config.web.server.invoke
@@ -12,15 +13,16 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 
 @Configuration
 @EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 class WebFluxSecurityConfig {
 
     @Bean
     // TODO: Remove and use oauth
     fun userDetailsService(): ReactiveUserDetailsService {
         val userDetails = User.withDefaultPasswordEncoder()
-            .username("user")
-            .password("user")
-            .roles("USER")
+            .username("admin")
+            .password("admin")
+            .roles("ADMIN")
             .build()
         return MapReactiveUserDetailsService(userDetails)
     }
@@ -32,7 +34,7 @@ class WebFluxSecurityConfig {
                 authorize(anyExchange, permitAll)
             }
             csrf { disable() } // TODO: Should I?
-            //httpBasic { }
+            httpBasic { }
         }
     }
 }

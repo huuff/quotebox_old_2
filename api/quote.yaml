@@ -20,6 +20,4 @@ Quote:
       items:
         type: string
   required:
-    - id # TODO: Only required for responses!
-    - author
     - text

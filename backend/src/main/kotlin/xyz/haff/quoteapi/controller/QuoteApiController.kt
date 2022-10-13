@@ -3,6 +3,7 @@ package xyz.haff.quoteapi.controller
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
@@ -22,6 +23,16 @@ class QuoteApiController(
         return ResponseEntity.ok(quoteMapper.entityToDto(quote))
     }
 
+    // TODO: Validations?
+    // TODO: Test
+    @PreAuthorize("hasRole('ADMIN')")
+    override suspend fun v1AddQuote(quoteDto: QuoteDto): ResponseEntity<Unit> {
+        val entity = quoteRepository.insert(quoteMapper.dtoToEntity(quoteDto))
+            .awaitSingleOrNull() ?: return ResponseEntity.internalServerError().build()
+
+        return ResponseEntity.created(URI.create("/quote/${entity.id}")).build()
+    }
+
     override suspend fun v1RandomQuote(author: String?, tags: List<String>?): ResponseEntity<Unit> {
         val quoteEntity = try {
             // MAYBE: A repository method that returns a random ID instead of a random entity? Otherwise, it might be
@@ -38,13 +49,4 @@ class QuoteApiController(
             .build()
     }
 
-    // TODO: Validations?
-    // TODO: Secure
-    // TODO: Test
-    override suspend fun v1AddQuote(quoteDto: QuoteDto): ResponseEntity<Unit> {
-        val entity = quoteRepository.insert(quoteMapper.dtoToEntity(quoteDto))
-            .awaitSingleOrNull() ?: return ResponseEntity.internalServerError().build()
-
-        return ResponseEntity.created(URI.create("/quote/${entity.id}")).build()
-    }
 }
