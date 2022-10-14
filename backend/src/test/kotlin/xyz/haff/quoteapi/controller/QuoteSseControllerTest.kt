@@ -30,10 +30,10 @@ class QuoteSseControllerTest(
         // ARRANGE
         every {
             quoteRepository.getRandom()
-        } returns Mono.just(TestData.entities[0]) andThen Mono.just(TestData.entities[1]) andThen Mono.just(TestData.entities[2])
+        } returns Mono.just(TestData.quoteEntities[0]) andThen Mono.just(TestData.quoteEntities[1]) andThen Mono.just(TestData.quoteEntities[2])
         every {
             quoteMapper.entityToDto(any())
-        } returns TestData.dtos[0] andThen TestData.dtos[1] andThen TestData.dtos[2]
+        } returns TestData.quoteDtos[0] andThen TestData.quoteDtos[1] andThen TestData.quoteDtos[2]
 
         // ACT
         val responses = webClient.get()
@@ -52,11 +52,11 @@ class QuoteSseControllerTest(
         // ASSERT
         StepVerifier.withVirtualTime { responses }
             .expectSubscription()
-            .expectNext(TestData.dtos[0])
+            .expectNext(TestData.quoteDtos[0])
             .thenAwait(1.millis)
-            .expectNext(TestData.dtos[1])
+            .expectNext(TestData.quoteDtos[1])
             .thenAwait(1.millis)
-            .expectNext(TestData.dtos[2])
+            .expectNext(TestData.quoteDtos[2])
             .verifyComplete()
     }
 })

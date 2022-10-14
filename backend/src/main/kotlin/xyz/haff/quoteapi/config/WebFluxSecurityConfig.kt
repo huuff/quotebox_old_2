@@ -6,25 +6,26 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.config.web.server.invoke
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.server.SecurityWebFilterChain
+import xyz.haff.quoteapi.security.User
 
 @Configuration
 @EnableWebFluxSecurity
-@EnableReactiveMethodSecurity
+@EnableReactiveMethodSecurity(proxyTargetClass = true)
 class WebFluxSecurityConfig {
 
     @Bean
-    // TODO: Remove and use oauth
+    // TODO: Use oAuth
     fun userDetailsService(): ReactiveUserDetailsService {
-        val userDetails = User.withDefaultPasswordEncoder()
-            .username("admin")
-            .password("admin")
-            .roles("ADMIN")
-            .build()
-        return MapReactiveUserDetailsService(userDetails)
+        val fakeUser = User(
+            id = "fakeid",
+            authorities = mutableListOf(SimpleGrantedAuthority("ROLE_ADMIN"))
+        )
+        return MapReactiveUserDetailsService(fakeUser)
     }
 
     @Bean
@@ -34,7 +35,8 @@ class WebFluxSecurityConfig {
                 authorize(anyExchange, permitAll)
             }
             csrf { disable() } // TODO: Should I?
-            httpBasic { }
+            logout { disable() }
+            httpBasic { disable() }
         }
     }
 }

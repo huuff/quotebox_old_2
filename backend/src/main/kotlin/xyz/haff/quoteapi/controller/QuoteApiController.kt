@@ -1,20 +1,25 @@
 package xyz.haff.quoteapi.controller
 
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
+import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
+import xyz.haff.quoteapi.security.User
 import java.net.URI
 
 @RestController
 class QuoteApiController(
     private val quoteRepository: QuoteRepository,
     private val quoteMapper: QuoteMapper,
+    private val userRepository: UserRepository,
 ) : QuoteApi {
 
     override suspend fun v1GetQuote(id: String): ResponseEntity<QuoteDto> {
@@ -24,13 +29,44 @@ class QuoteApiController(
     }
 
     // TODO: Validations?
-    // TODO: Test
     @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1AddQuote(quoteDto: QuoteDto): ResponseEntity<Unit> {
         val entity = quoteRepository.insert(quoteMapper.dtoToEntity(quoteDto))
             .awaitSingleOrNull() ?: return ResponseEntity.internalServerError().build()
 
         return ResponseEntity.created(URI.create("/quote/${entity.id}")).build()
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    override suspend fun v1UpdateQuote(id: String, quoteDto: QuoteDto): ResponseEntity<Unit> {
+        val existingEntity = quoteRepository.findById(id).awaitSingleOrNull()
+
+        if (existingEntity != null) {
+            existingEntity.apply {
+                text = quoteDto.text
+                author = quoteDto.author
+                tags = quoteDto.tags ?: listOf()
+                work = quoteDto.work
+            }
+            quoteRepository.save(existingEntity).awaitSingleOrNull()
+
+            return ResponseEntity.noContent().build()
+        } else {
+            val newEntity = quoteMapper.dtoToEntity(quoteDto).apply { this.id = id }
+            quoteRepository.insert(newEntity).awaitSingleOrNull()
+
+            return ResponseEntity.created(URI.create("/quote/${id}")).build()
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    override suspend fun v1DeleteQuote(id: String): ResponseEntity<Unit> {
+        if (!quoteRepository.existsById(id).awaitSingle()) {
+            return ResponseEntity.notFound().build()
+        }
+
+        quoteRepository.deleteById(id).awaitSingleOrNull()
+        return ResponseEntity.noContent().build()
     }
 
     override suspend fun v1RandomQuote(author: String?, tags: List<String>?): ResponseEntity<Unit> {
@@ -49,4 +85,19 @@ class QuoteApiController(
             .build()
     }
 
+    @PreAuthorize("isAuthenticated()")
+    override suspend fun v1LikeQuote(id: String): ResponseEntity<Unit> {
+        val user = ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication?.principal as User?
+            ?: return ResponseEntity.status(401).build()
+        val userEntity = userRepository.findById(user.id).awaitSingleOrNull()
+            ?: return ResponseEntity.status(401).build()
+
+        if (userEntity.likedQuotes.any { it.id == id }) {
+            // TODO: A description of why it's a bad request would be nice
+            return ResponseEntity.badRequest().build()
+        }
+
+        // TODO: Actually like the quote... likely a custom push method in the repository
+       return ResponseEntity.ok().build()
+    }
 }

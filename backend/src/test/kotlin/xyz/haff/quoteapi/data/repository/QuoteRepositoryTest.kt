@@ -1,11 +1,9 @@
 package xyz.haff.quoteapi.data.repository
 
-import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.reactor.awaitSingle
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.context.annotation.Import
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -36,42 +34,42 @@ class QuoteRepositoryTest(
 
     context("random") {
         test("getRandom") {
-            quoteRepository.getRandom().awaitSingle() shouldBeIn TestData.entities
+            quoteRepository.getRandom().awaitSingle() shouldBeIn TestData.quoteEntities
         }
 
         test("getRandomByAuthor") {
             // ARRANGE
-            val author = TestData.random.entity.author
+            val author = TestData.randomQuote.entity.author!!
 
             // ACT
             val quote = quoteRepository.getRandomByAuthor(author).awaitSingle()
 
             // ASSERT
-            quote shouldBeIn TestData.entities
+            quote shouldBeIn TestData.quoteEntities
             quote.author shouldBe author
         }
 
         test("getRandomByTags") {
             // ARRANGE
-            val tags = TestData.random.entity.tags
+            val tags = TestData.randomQuote.entity.tags
 
             // ACT
             val quote = quoteRepository.getRandomByTags(tags).awaitSingle()
 
             // ASSERT
-            quote shouldBeIn TestData.entities
+            quote shouldBeIn TestData.quoteEntities
             quote.tags shouldContainExactly tags
         }
 
         test("getRandomByAuthorAndTags") {
             // ARRANGE
-            val (_, _, author, _, tags) = TestData.random.entity
+            val (_, _, author, _, tags) = TestData.randomQuote.entity
 
             // ACT
-            val quote = quoteRepository.getRandomByAuthorAndTags(author, tags).awaitSingle()
+            val quote = quoteRepository.getRandomByAuthorAndTags(author!!, tags).awaitSingle()
 
             // ASSERT
-            quote shouldBeIn TestData.entities
+            quote shouldBeIn TestData.quoteEntities
             quote.tags shouldContainExactly tags
             quote.author shouldBe author
         }

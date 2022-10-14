@@ -7,7 +7,7 @@ import java.util.*
 data class QuoteEntity(
     @Id var id: String? = null,
     var text: String,
-    var author: String,
+    var author: String? = null,
     var work: String? = null,
     var tags: List<String> = listOf(),
 )

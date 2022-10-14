@@ -1,3 +1,4 @@
+# TODO: Add 403 and 401 responses?
 openapi: 3.0.3
 info:
   title: Quote API
@@ -26,9 +27,28 @@ paths:
             Location:
               schema:
                 type: string
+        '404':
+          description: No quote found with given parameters
+  /quote/{id}/like:
+    post:
+      summary: Like a quote
+      operationId: v1LikeQuote
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Quote was succesfully liked
+        '400':
+          description: Quote was already liked
+        '404':
+          description: Quote not found
   /quote/{id}:
     get:
-      summary: Get a specific quote
+      summary: Get a quote by id
       operationId: v1GetQuote
       parameters:
         - in: path
@@ -43,6 +63,43 @@ paths:
             application/json:
               schema:
                 $ref: quote.yaml#/Quote
+        '404':
+          description: The quote wasn't found
+    delete:
+      summary: Delete a quote by id
+      operationId: v1DeleteQuote
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: The quote was successfully deletes
+        '404':
+          description: The quote wasn't found
+    put:
+      summary: Edit or create a new quote
+      operationId: v1UpdateQuote
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Quote to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: quote.yaml#/Quote
+      responses:
+        '201':
+          description: A new quote was created
+        '204':
+          description: The quote was modified
   /quote:
     post:
       summary: Add a new quote
