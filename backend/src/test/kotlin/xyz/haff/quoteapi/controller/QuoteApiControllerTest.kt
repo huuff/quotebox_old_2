@@ -242,6 +242,26 @@ class QuoteApiControllerTest(
                 .expectStatus()
                 .isOk
         }
+
+        test("400 (quote already liked)") {
+            // ARRANGE
+            val fakeUser = User("63497d171b7c64ed35ce57b7")
+            val fakeQuoteId = "63497e3699b55ab8837623aa"
+            every { userRepository.findById(eq(fakeUser.id)) } returns Mono.just(mockk {
+                every { likedQuotes } returns listOf(mockk {
+                    every { id } returns fakeQuoteId
+                })
+            })
+
+            // ACT & ASSERT
+            webClient
+                .mutateWith(mockUser(fakeUser))
+                .post()
+                .uri("/quote/$fakeQuoteId/like")
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+        }
     }
 
 })
