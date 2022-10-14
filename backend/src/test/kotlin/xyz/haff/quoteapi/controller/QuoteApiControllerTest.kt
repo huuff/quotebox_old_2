@@ -228,7 +228,9 @@ class QuoteApiControllerTest(
             // ARRANGE
             val fakeUser = User("63497d171b7c64ed35ce57b7")
             val fakeQuoteId = "63497e3699b55ab8837623aa"
-            every { userRepository.findById(eq(fakeUser.id)) } returns mockk()
+            every { userRepository.findById(eq(fakeUser.id)) } returns Mono.just(mockk {
+                every { likedQuotes } returns listOf()
+            })
 
             // ACT & ASSERT
             // TODO: Actually test that the quote is liked
