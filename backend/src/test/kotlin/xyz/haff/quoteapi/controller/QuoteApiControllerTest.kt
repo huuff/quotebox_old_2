@@ -223,8 +223,8 @@ class QuoteApiControllerTest(
         verify { quoteRepository.getRandom() }
     }
 
-    context("v1LikeQuote") {
-        test("200") {
+    context("v1ToggleQuoteLike") {
+        test("200 (like quote)") {
             // ARRANGE
             val fakeUser = User("63497d171b7c64ed35ce57b7")
             val fakeQuoteId = "63497e3699b55ab8837623aa"
@@ -237,13 +237,13 @@ class QuoteApiControllerTest(
             webClient
                 .mutateWith(mockUser(fakeUser))
                 .post()
-                .uri("/quote/$fakeQuoteId/like")
+                .uri("/quote/$fakeQuoteId/like/toggle")
                 .exchange()
                 .expectStatus()
                 .isOk
         }
 
-        test("400 (quote already liked)") {
+        test("200 (unlike quote)") {
             // ARRANGE
             val fakeUser = User("63497d171b7c64ed35ce57b7")
             val fakeQuoteId = "63497e3699b55ab8837623aa"
@@ -257,10 +257,10 @@ class QuoteApiControllerTest(
             webClient
                 .mutateWith(mockUser(fakeUser))
                 .post()
-                .uri("/quote/$fakeQuoteId/like")
+                .uri("/quote/$fakeQuoteId/like/toggle")
                 .exchange()
                 .expectStatus()
-                .isBadRequest
+                .isOk
         }
     }
 

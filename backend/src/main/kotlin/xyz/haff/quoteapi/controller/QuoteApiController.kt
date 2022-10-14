@@ -37,6 +37,7 @@ class QuoteApiController(
         return ResponseEntity.created(URI.create("/quote/${entity.id}")).build()
     }
 
+    // TODO: Maybe should be transactional?
     @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1UpdateQuote(id: String, quoteDto: QuoteDto): ResponseEntity<Unit> {
         val existingEntity = quoteRepository.findById(id).awaitSingleOrNull()
@@ -59,6 +60,7 @@ class QuoteApiController(
         }
     }
 
+    // TODO: Maybe should be transactional?
     @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1DeleteQuote(id: String): ResponseEntity<Unit> {
         if (!quoteRepository.existsById(id).awaitSingle()) {
@@ -85,19 +87,20 @@ class QuoteApiController(
             .build()
     }
 
+    // TODO: Maybe should be transactional?
     @PreAuthorize("isAuthenticated()")
-    override suspend fun v1LikeQuote(id: String): ResponseEntity<Unit> {
+    override suspend fun v1ToggleQuoteLike(id: String): ResponseEntity<Unit> {
         val user = ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication?.principal as User?
             ?: return ResponseEntity.status(401).build()
         val userEntity = userRepository.findById(user.id).awaitSingleOrNull()
             ?: return ResponseEntity.status(401).build()
 
-        if (userEntity.likedQuotes.any { it.id == id }) {
-            // TODO: A description of why it's a bad request would be nice
-            return ResponseEntity.badRequest().build()
+        return if (userEntity.likedQuotes.any { it.id == id }) {
+            // TODO: Actually unlike it
+            ResponseEntity.ok().build()
+        } else {
+            // TODO: Actually like the quote... likely a custom push method in the repository
+            return ResponseEntity.ok().build()
         }
-
-        // TODO: Actually like the quote... likely a custom push method in the repository
-       return ResponseEntity.ok().build()
     }
 }
