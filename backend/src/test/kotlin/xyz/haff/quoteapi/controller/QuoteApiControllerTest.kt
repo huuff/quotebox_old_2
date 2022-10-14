@@ -99,7 +99,7 @@ class QuoteApiControllerTest(
                 .isForbidden
         }
 
-        // TODO: It fails weirdly! surely it's the fault of webtestclient
+        // TODO: It fails weirdly! surely it's the fault of WebTestClient
         test("admin can correctly add quotes") {
             // ARRANGE
             every { quoteMapper.dtoToEntity(any()) } returns entity
@@ -110,11 +110,7 @@ class QuoteApiControllerTest(
                 .post()
                 .uri("/quote")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                    {
-                      "text": "test"
-                    }
-                """.trimIndent())
+                .body(Mono.just(dto), QuoteDto::class.java)
                 .exchange()
                 .expectStatus()
                 .isCreated
