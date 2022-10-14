@@ -29,10 +29,11 @@ paths:
                 type: string
         '404':
           description: No quote found with given parameters
-  /quote/{id}/like:
+  # TODO: Return some indicator of whether the new status is liked or not liked?
+  /quote/{id}/like/toggle:
     post:
-      summary: Like a quote
-      operationId: v1LikeQuote
+      summary:  Toggle like on a quote
+      operationId: v1ToggleQuoteLike
       parameters:
         - in: path
           name: id
@@ -41,9 +42,7 @@ paths:
           required: true
       responses:
         '200':
-          description: Quote was succesfully liked
-        '400':
-          description: Quote was already liked
+          description: Like successfully toggled
         '404':
           description: Quote not found
   /quote/{id}:
