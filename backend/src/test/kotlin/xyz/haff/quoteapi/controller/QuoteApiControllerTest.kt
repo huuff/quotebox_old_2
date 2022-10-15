@@ -80,8 +80,7 @@ class QuoteApiControllerTest(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(dto), QuoteDto::class.java)
                 .exchange()
-                .expectStatus()
-                .isUnauthorized
+                .expectStatus().isUnauthorized
         }
 
         test("403") {
@@ -92,8 +91,7 @@ class QuoteApiControllerTest(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(dto), QuoteDto::class.java)
                 .exchange()
-                .expectStatus()
-                .isForbidden
+                .expectStatus().isForbidden
         }
 
         test("201") {
@@ -109,8 +107,7 @@ class QuoteApiControllerTest(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(dto), QuoteDto::class.java)
                 .exchange()
-                .expectStatus()
-                .isCreated
+                .expectStatus().isCreated
                 .expectHeader()
                 .location("/quote/${entity.id}")
         }
@@ -133,8 +130,7 @@ class QuoteApiControllerTest(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(dto), QuoteDto::class.java)
                 .exchange()
-                .expectStatus()
-                .isCreated
+                .expectStatus().isCreated
                 .expectHeader()
                 .location("/quote/$fakeId")
 
@@ -159,8 +155,7 @@ class QuoteApiControllerTest(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(dto), QuoteDto::class.java)
                 .exchange()
-                .expectStatus()
-                .isNoContent
+                .expectStatus().isNoContent
 
             verify {
                 mockEntity.text = dto.text
@@ -185,8 +180,7 @@ class QuoteApiControllerTest(
                 .delete()
                 .uri("/quote/$fakeId")
                 .exchange()
-                .expectStatus()
-                .isNoContent
+                .expectStatus().isNoContent
 
             verify { quoteRepository.deleteById(eq(fakeId)) }
         }
@@ -202,8 +196,7 @@ class QuoteApiControllerTest(
                 .delete()
                 .uri("/quote/$fakeId")
                 .exchange()
-                .expectStatus()
-                .isNotFound
+                .expectStatus().isNotFound
         }
     }
 
@@ -240,8 +233,7 @@ class QuoteApiControllerTest(
                 .post()
                 .uri("/quote/$fakeQuoteId/like/toggle")
                 .exchange()
-                .expectStatus()
-                .isOk
+                .expectStatus().isOk
         }
 
         test("200 (unlike quote)") {
@@ -261,8 +253,7 @@ class QuoteApiControllerTest(
                 .post()
                 .uri("/quote/$fakeQuoteId/like/toggle")
                 .exchange()
-                .expectStatus()
-                .isOk
+                .expectStatus().isOk
         }
     }
 
