@@ -28,12 +28,13 @@ import xyz.haff.quoteapi.testing.TestData
     controllers = [ QuoteApiController::class ],
     excludeAutoConfiguration = [ ReactiveSecurityAutoConfiguration::class ],
 )
-@Import(WebFluxSecurityConfig::class, ToggleQuoteLikeService::class)
+@Import(WebFluxSecurityConfig::class)
 class QuoteApiControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val quoteMapper: QuoteMapper,
     @MockkBean private val userRepository: UserRepository,
+    @MockkBean private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : FunSpec({
     val (entity, dto) = TestData.randomQuote
 
@@ -218,15 +219,12 @@ class QuoteApiControllerTest(
     }
 
     context("v1ToggleQuoteLike") {
-        test("200 (like quote)") {
+        // TODO: Test error cases
+        test("200") {
             // ARRANGE
             val fakeUser = User("63497d171b7c64ed35ce57b7")
             val fakeQuoteId = "63497e3699b55ab8837623aa"
-            every { userRepository.findById(eq(fakeUser.id)) } returns Mono.just(mockk {
-                every { likedQuotes } returns listOf()
-            })
-            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns Mono.just(true)
-            every { userRepository.addLikedQuote(eq(fakeUser.id), eq(fakeQuoteId))} returns Mono.just(1L)
+            coEvery { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUser.id), eq(fakeQuoteId)) } returns true
 
             // ACT & ASSERT
             webClient
@@ -236,30 +234,7 @@ class QuoteApiControllerTest(
                 .exchange()
                 .expectStatus().isOk
 
-            verify { userRepository.addLikedQuote(eq(fakeUser.id), eq(fakeQuoteId)) }
-        }
-
-        test("200 (unlike quote)") {
-            // ARRANGE
-            val fakeUser = User("63497d171b7c64ed35ce57b7")
-            val fakeQuoteId = "63497e3699b55ab8837623aa"
-            every { userRepository.findById(eq(fakeUser.id)) } returns Mono.just(mockk {
-                every { likedQuotes } returns listOf(mockk {
-                    every { id } returns fakeQuoteId
-                })
-            })
-            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns Mono.just(true)
-            every { userRepository.removeLikedQuote(eq(fakeUser.id), eq(fakeQuoteId))} returns Mono.just(1L)
-
-            // ACT & ASSERT
-            webClient
-                .mutateWith(mockUser(fakeUser))
-                .post()
-                .uri("/quote/$fakeQuoteId/like/toggle")
-                .exchange()
-                .expectStatus().isOk
-
-            verify { userRepository.removeLikedQuote(eq(fakeUser.id), eq(fakeQuoteId)) }
+            coVerify { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUser.id), eq(fakeQuoteId)) }
         }
     }
 
