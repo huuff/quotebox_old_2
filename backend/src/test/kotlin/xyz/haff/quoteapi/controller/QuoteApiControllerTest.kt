@@ -38,7 +38,7 @@ class QuoteApiControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val quoteMapper: QuoteMapper,
-    @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder,
+    @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder, // Prevents oAuth breakage
     @MockkBean private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : FunSpec({
     val (entity, dto) = TestData.randomQuote

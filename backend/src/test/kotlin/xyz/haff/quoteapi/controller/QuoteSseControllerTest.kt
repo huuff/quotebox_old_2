@@ -24,7 +24,7 @@ class QuoteSseControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val quoteMapper: QuoteMapper,
-    @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder,
+    @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder, // Prevents oAuth breakage
 ) : FunSpec({
 
 
