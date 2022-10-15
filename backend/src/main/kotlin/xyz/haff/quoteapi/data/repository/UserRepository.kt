@@ -9,6 +9,8 @@ import xyz.haff.quoteapi.data.entity.UserEntity
 interface UserRepository : ReactiveMongoRepository<UserEntity, String> {
 
     @Query("{ '_id':  '?0' }")
-    @Update("{ '\$push': { 'liked_quotes': ObjectId('?1') } }")
+    @Update("{ '\$addToSet': { 'liked_quotes': ObjectId('?1') } }")
     fun addLikedQuote(userId: String, likedQuoteId: String): Mono<Long>
+
+
 }
