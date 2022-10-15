@@ -68,7 +68,6 @@ class WebFluxSecurityConfig {
 
         // TODO: Try the commented out way
         val grantedAuthoritiesConverter = Converter<Jwt, Flux<GrantedAuthority>> { source ->
-                println(source);
                 Flux.fromIterable(
                     ((source.claims["realm_access"] as Map<String, Any>)["roles"] as List<String>)
 
