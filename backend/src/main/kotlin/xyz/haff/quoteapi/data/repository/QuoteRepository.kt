@@ -3,6 +3,7 @@ package xyz.haff.quoteapi.data.repository
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
+import org.springframework.data.mongodb.repository.Update
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
@@ -47,4 +48,5 @@ interface QuoteRepository : ReactiveMongoRepository<QuoteEntity, String> {
         ]
     )
     fun getRandomByAuthorAndTags(author: String, tags: List<String>): Mono<QuoteEntity>
+
 }

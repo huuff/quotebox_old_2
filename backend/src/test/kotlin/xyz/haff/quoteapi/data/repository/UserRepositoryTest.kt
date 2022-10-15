@@ -1,9 +1,15 @@
 package xyz.haff.quoteapi.data.repository
 
+import io.kotest.inspectors.shouldForNone
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.context.annotation.Import
@@ -27,6 +33,21 @@ class UserRepositoryTest(
 
         user.shouldNotBeNull()
         user.likedQuotes shouldBe TestData.userEntity.likedQuotes
+    }
+
+    test("can add liked quotes") {
+        val quoteToLike = TestData.quoteNotLikedByUser
+        val user = userRepository.findById(TestData.userEntity.id!!).awaitSingle()
+
+        // SANITY CHECK
+        user.likedQuotes.map { it.id } shouldNotContain quoteToLike.id
+
+        // ACT
+        val changedRecords = userRepository.addLikedQuote(user.id!!, quoteToLike.id!!).awaitSingle()
+
+        // ASSERT
+        changedRecords shouldBe 1
+        userRepository.findById(user.id!!).awaitSingle().likedQuotes.map { it.id } shouldContain quoteToLike.id
     }
 
 })

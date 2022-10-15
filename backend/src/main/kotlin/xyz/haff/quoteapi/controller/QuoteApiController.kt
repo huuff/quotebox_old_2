@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.web.bind.annotation.RestController
+import reactor.kotlin.extra.bool.not
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
@@ -88,6 +89,8 @@ class QuoteApiController(
     }
 
     // TODO: Maybe should be transactional?
+    // TODO: So many queries... this can't be performant!
+    // TODO: Maybe should be in a service
     @PreAuthorize("isAuthenticated()")
     override suspend fun v1ToggleQuoteLike(id: String): ResponseEntity<Unit> {
         val user = ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication?.principal as User?
@@ -95,12 +98,16 @@ class QuoteApiController(
         val userEntity = userRepository.findById(user.id).awaitSingleOrNull()
             ?: return ResponseEntity.status(401).build()
 
-        return if (userEntity.likedQuotes.any { it.id == id }) {
-            // TODO: Actually unlike it
-            ResponseEntity.ok().build()
-        } else {
+        if (!quoteRepository.existsById(id).awaitSingle()) {
+            return ResponseEntity.notFound().build()
+        }
+
+        return if (userEntity.likedQuotes.none { it.id == id }) { // The quote is not already liked
             // TODO: Actually like the quote... likely a custom push method in the repository
             return ResponseEntity.ok().build()
+        } else { // The quote is already liked
+            // TODO: Actually unlike it
+            ResponseEntity.ok().build()
         }
     }
 }

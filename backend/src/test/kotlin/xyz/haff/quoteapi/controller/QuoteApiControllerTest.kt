@@ -231,6 +231,7 @@ class QuoteApiControllerTest(
             every { userRepository.findById(eq(fakeUser.id)) } returns Mono.just(mockk {
                 every { likedQuotes } returns listOf()
             })
+            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns Mono.just(true)
 
             // ACT & ASSERT
             // TODO: Actually test that the quote is liked
@@ -252,6 +253,7 @@ class QuoteApiControllerTest(
                     every { id } returns fakeQuoteId
                 })
             })
+            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns Mono.just(true)
 
             // ACT & ASSERT
             webClient

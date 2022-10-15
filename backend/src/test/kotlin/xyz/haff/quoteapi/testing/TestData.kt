@@ -19,8 +19,10 @@ object TestData {
 
     val userEntity = UserEntity(
         id = "63496eefee427e052e33c826",
-        likedQuotes = quoteEntities,
+        likedQuotes = listOf(quoteEntities[0], quoteEntities[1]),
     )
+
+    val quoteNotLikedByUser get() = quoteEntities[2]
 
     data class QuoteEntityAndDto(val entity: QuoteEntity, val dto: QuoteDto)
     val randomQuote get(): QuoteEntityAndDto {
