@@ -1,0 +1,19 @@
+# Docker environment for demoing
+services:
+  mongo:
+    image: mongo:focal
+    ports:
+      - 27017:27017
+    volumes:
+      - quotebox_mongo:/data/db
+  keycloak:
+    image: jboss/keycloak
+    ports:
+      - 8180:8080
+    environment:
+      KEYCLOAK_USER: test
+      KEYCLOAK_PASSWORD: test
+
+volumes:
+  quotebox_mongo: {}
+  quotebox_keycloak: {}

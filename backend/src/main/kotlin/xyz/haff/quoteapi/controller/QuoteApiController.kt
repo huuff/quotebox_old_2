@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.RestController
 import reactor.kotlin.extra.bool.not
 import xyz.haff.quoteapi.data.repository.QuoteRepository
@@ -66,7 +67,7 @@ class QuoteApiController(
     }
 
     // TODO: Maybe should be transactional?
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     override suspend fun v1DeleteQuote(id: String): ResponseEntity<Unit> {
         if (!quoteRepository.existsById(id).awaitSingle()) {
             return ResponseEntity.notFound().build()
