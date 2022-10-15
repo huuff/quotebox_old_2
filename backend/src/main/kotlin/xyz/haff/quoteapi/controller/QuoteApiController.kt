@@ -109,8 +109,11 @@ class QuoteApiController(
             else
                 ResponseEntity.internalServerError().build()
         } else { // The quote is already liked
-            // TODO: Actually unlike it
-            ResponseEntity.ok().build()
+            val modifiedCount = userRepository.removeLikedQuote(user.id, id).awaitSingle()
+            if (modifiedCount == 1L)
+                ResponseEntity.ok().build()
+            else
+                ResponseEntity.internalServerError().build()
         }
     }
 }

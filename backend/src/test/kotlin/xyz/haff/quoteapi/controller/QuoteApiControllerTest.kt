@@ -248,6 +248,7 @@ class QuoteApiControllerTest(
                 })
             })
             every { quoteRepository.existsById(eq(fakeQuoteId)) } returns Mono.just(true)
+            every { userRepository.removeLikedQuote(eq(fakeUser.id), eq(fakeQuoteId))} returns Mono.just(1L)
 
             // ACT & ASSERT
             webClient
@@ -256,6 +257,8 @@ class QuoteApiControllerTest(
                 .uri("/quote/$fakeQuoteId/like/toggle")
                 .exchange()
                 .expectStatus().isOk
+
+            verify { userRepository.removeLikedQuote(eq(fakeUser.id), eq(fakeQuoteId)) }
         }
     }
 

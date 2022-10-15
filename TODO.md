@@ -1,7 +1,6 @@
 # Tasks
 * Photos on authors
-* Liking quotes
-* Extended reference pattern in quote
+* Extended reference pattern in quote (to author)
 * See if I can return descriptive messages for bad requests
 * A regex so quotes can only be valid words?
 * Auth should be in OpenAPI too, I guess
