@@ -9,3 +9,4 @@
   * By params, and paged
   * Randomly and by params
 * Return whether a quote is liked in the `QuoteDto`
+* Add kover
