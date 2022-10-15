@@ -12,5 +12,8 @@ interface UserRepository : ReactiveMongoRepository<UserEntity, String> {
     @Update("{ '\$addToSet': { 'liked_quotes': ObjectId('?1') } }")
     fun addLikedQuote(userId: String, likedQuoteId: String): Mono<Long>
 
+    @Query("{ '_id':  '?0'}")
+    @Update("{ '\$pull': { 'liked_quotes': ObjectId('?1') } }")
+    fun removeLikedQuote(userId: String, likedQuoteId: String): Mono<Long>
 
 }

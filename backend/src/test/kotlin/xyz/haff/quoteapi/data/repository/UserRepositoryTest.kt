@@ -35,7 +35,8 @@ class UserRepositoryTest(
         user.likedQuotes shouldBe TestData.userEntity.likedQuotes
     }
 
-    test("can add liked quotes") {
+    test("addLikedQuote") {
+        // ARRANGE
         val quoteToLike = TestData.quoteNotLikedByUser
         val user = userRepository.findById(TestData.userEntity.id!!).awaitSingle()
 
@@ -48,6 +49,22 @@ class UserRepositoryTest(
         // ASSERT
         changedRecords shouldBe 1
         userRepository.findById(user.id!!).awaitSingle().likedQuotes.map { it.id } shouldContain quoteToLike.id
+    }
+
+    test("removeLikedQuote") {
+        // ARRANGE
+        val user = userRepository.findById(TestData.userEntity.id!!).awaitSingle()
+        val quoteToRemove = user.likedQuotes[0]
+
+        // SANITY CHECK
+        user.likedQuotes.map { it.id } shouldContain quoteToRemove.id
+
+        // ACT
+        val changedRecords = userRepository.removeLikedQuote(user.id!!, quoteToRemove.id!!).awaitSingle()
+
+        // ASSERT
+        changedRecords shouldBe 1
+        userRepository.findById(user.id!!).awaitSingle().likedQuotes.map { it.id } shouldNotContain quoteToRemove.id
     }
 
 })
