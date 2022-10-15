@@ -12,8 +12,11 @@ import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
+import xyz.haff.quoteapi.exception.QuoteNotFoundException
+import xyz.haff.quoteapi.exception.UserNotFoundException
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.security.User
+import xyz.haff.quoteapi.service.ToggleQuoteLikeService
 import java.net.URI
 
 @RestController
@@ -21,6 +24,7 @@ class QuoteApiController(
     private val quoteRepository: QuoteRepository,
     private val quoteMapper: QuoteMapper,
     private val userRepository: UserRepository,
+    private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : QuoteApi {
 
     override suspend fun v1GetQuote(id: String): ResponseEntity<QuoteDto> {
@@ -88,32 +92,23 @@ class QuoteApiController(
             .build()
     }
 
-    // TODO: Maybe should be transactional?
-    // TODO: So many queries... this can't be performant!
-    // TODO: Maybe should be in a service
+
     @PreAuthorize("isAuthenticated()")
     override suspend fun v1ToggleQuoteLike(id: String): ResponseEntity<Unit> {
         val user = ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication?.principal as User?
             ?: return ResponseEntity.status(401).build()
-        val userEntity = userRepository.findById(user.id).awaitSingleOrNull()
-            ?: return ResponseEntity.status(401).build()
 
-        if (!quoteRepository.existsById(id).awaitSingle()) {
-            return ResponseEntity.notFound().build()
-        }
-
-        return if (userEntity.likedQuotes.none { it.id == id }) { // The quote is not already liked
-            val modifiedCount = userRepository.addLikedQuote(user.id, id).awaitSingle()
-            if (modifiedCount == 1L)
+        return try {
+            val wasApplied = toggleQuoteLikeService.toggleQuoteLike(user.id, id)
+            if (wasApplied) {
                 ResponseEntity.ok().build()
-            else
+            } else {
                 ResponseEntity.internalServerError().build()
-        } else { // The quote is already liked
-            val modifiedCount = userRepository.removeLikedQuote(user.id, id).awaitSingle()
-            if (modifiedCount == 1L)
-                ResponseEntity.ok().build()
-            else
-                ResponseEntity.internalServerError().build()
+            }
+        } catch (e: UserNotFoundException) {
+            ResponseEntity.notFound().build()
+        } catch (e: QuoteNotFoundException) {
+            ResponseEntity.notFound().build()
         }
     }
 }

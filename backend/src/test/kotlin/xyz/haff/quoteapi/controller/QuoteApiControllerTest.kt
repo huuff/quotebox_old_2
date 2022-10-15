@@ -20,6 +20,7 @@ import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.security.User
+import xyz.haff.quoteapi.service.ToggleQuoteLikeService
 import xyz.haff.quoteapi.testing.TestData
 
 // TODO: Replace all of the Mono.just with mono { }? Does that work?
@@ -27,7 +28,7 @@ import xyz.haff.quoteapi.testing.TestData
     controllers = [ QuoteApiController::class ],
     excludeAutoConfiguration = [ ReactiveSecurityAutoConfiguration::class ],
 )
-@Import(WebFluxSecurityConfig::class)
+@Import(WebFluxSecurityConfig::class, ToggleQuoteLikeService::class)
 class QuoteApiControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
