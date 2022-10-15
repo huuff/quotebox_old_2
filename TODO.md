@@ -1,4 +1,5 @@
 # Tasks
+## Backend
 * Photos on authors
 * Extended reference pattern in quote (to author)
 * See if I can return descriptive messages for bad requests
@@ -10,3 +11,4 @@
   * Randomly and by params
 * Return whether a quote is liked in the `QuoteDto`
 * Add kover
+* An integration test for oAuth? Seems like hard

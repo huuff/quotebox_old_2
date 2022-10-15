@@ -1,7 +1,5 @@
 package xyz.haff.quoteapi.config
 
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.reactor.asFlux
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
@@ -12,8 +10,6 @@ import org.springframework.security.config.web.server.invoke
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter
 import org.springframework.security.web.server.SecurityWebFilterChain
 import reactor.core.publisher.Flux

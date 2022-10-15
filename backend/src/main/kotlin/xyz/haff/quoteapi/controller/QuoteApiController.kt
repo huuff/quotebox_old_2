@@ -24,7 +24,6 @@ import java.net.URI
 class QuoteApiController(
     private val quoteRepository: QuoteRepository,
     private val quoteMapper: QuoteMapper,
-    private val userRepository: UserRepository,
     private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : QuoteApi {
 
@@ -67,7 +66,7 @@ class QuoteApiController(
     }
 
     // TODO: Maybe should be transactional?
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1DeleteQuote(id: String): ResponseEntity<Unit> {
         if (!quoteRepository.existsById(id).awaitSingle()) {
             return ResponseEntity.notFound().build()

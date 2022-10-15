@@ -6,6 +6,7 @@ import io.mockk.every
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.Mono
@@ -23,6 +24,7 @@ class QuoteSseControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val quoteMapper: QuoteMapper,
+    @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder,
 ) : FunSpec({
 
 

@@ -5,10 +5,13 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.reactive.awaitSingle
+import org.springframework.boot.autoconfigure.security.oauth2.client.reactive.ReactiveOAuth2ClientAutoConfiguration
+import org.springframework.boot.autoconfigure.security.oauth2.resource.reactive.ReactiveOAuth2ResourceServerAutoConfiguration
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
@@ -25,15 +28,17 @@ import xyz.haff.quoteapi.testing.TestData
 
 // TODO: Replace all of the Mono.just with mono { }? Does that work?
 @WebFluxTest(
-    controllers = [ QuoteApiController::class ],
-    excludeAutoConfiguration = [ ReactiveSecurityAutoConfiguration::class ],
+    controllers = [QuoteApiController::class],
+    excludeAutoConfiguration = [
+        ReactiveSecurityAutoConfiguration::class,
+    ],
 )
 @Import(WebFluxSecurityConfig::class)
 class QuoteApiControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val quoteMapper: QuoteMapper,
-    @MockkBean private val userRepository: UserRepository,
+    @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder,
     @MockkBean private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : FunSpec({
     val (entity, dto) = TestData.randomQuote
@@ -42,7 +47,7 @@ class QuoteApiControllerTest(
         test("200 OK") {
             // ARRANGE
             every { quoteRepository.findById(any<String>()) } returns Mono.just(entity)
-            every { quoteMapper.entityToDto(any())} returns dto
+            every { quoteMapper.entityToDto(any()) } returns dto
 
             // ACT
             val response = webClient.get()
