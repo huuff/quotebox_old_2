@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
@@ -227,19 +228,21 @@ class QuoteApiControllerTest(
         // TODO: Test error cases
         test("200") {
             // ARRANGE
-            val fakeUser = User("63497d171b7c64ed35ce57b7")
+            val fakeUserId = "63497d171b7c64ed35ce57b7"
             val fakeQuoteId = "63497e3699b55ab8837623aa"
-            coEvery { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUser.id), eq(fakeQuoteId)) } returns true
+            coEvery { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) } returns true
 
             // ACT & ASSERT
             webClient
-                .mutateWith(mockUser(fakeUser))
+                .mutateWith(mockJwt().jwt {
+                    it.subject(fakeUserId)
+                })
                 .post()
                 .uri("/quote/$fakeQuoteId/like/toggle")
                 .exchange()
                 .expectStatus().isOk
 
-            coVerify { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUser.id), eq(fakeQuoteId)) }
+            coVerify { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) }
         }
     }
 

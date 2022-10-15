@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.RestController
 import reactor.kotlin.extra.bool.not
 import xyz.haff.quoteapi.data.repository.QuoteRepository
@@ -95,11 +96,12 @@ class QuoteApiController(
 
     @PreAuthorize("isAuthenticated()")
     override suspend fun v1ToggleQuoteLike(id: String): ResponseEntity<Unit> {
-        val user = ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication?.principal as User?
+        val userId = (ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication?.principal as Jwt?)
+            ?.subject
             ?: return ResponseEntity.status(401).build()
 
         return try {
-            val wasApplied = toggleQuoteLikeService.toggleQuoteLike(user.id, id)
+            val wasApplied = toggleQuoteLikeService.toggleQuoteLike(userId, id)
             if (wasApplied) {
                 ResponseEntity.ok().build()
             } else {
