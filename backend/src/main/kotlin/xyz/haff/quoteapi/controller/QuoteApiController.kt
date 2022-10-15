@@ -103,8 +103,11 @@ class QuoteApiController(
         }
 
         return if (userEntity.likedQuotes.none { it.id == id }) { // The quote is not already liked
-            // TODO: Actually like the quote... likely a custom push method in the repository
-            return ResponseEntity.ok().build()
+            val modifiedCount = userRepository.addLikedQuote(user.id, id).awaitSingle()
+            if (modifiedCount == 1L)
+                ResponseEntity.ok().build()
+            else
+                ResponseEntity.internalServerError().build()
         } else { // The quote is already liked
             // TODO: Actually unlike it
             ResponseEntity.ok().build()

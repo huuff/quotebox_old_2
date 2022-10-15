@@ -225,15 +225,17 @@ class QuoteApiControllerTest(
                 every { likedQuotes } returns listOf()
             })
             every { quoteRepository.existsById(eq(fakeQuoteId)) } returns Mono.just(true)
+            every { userRepository.addLikedQuote(eq(fakeUser.id), eq(fakeQuoteId))} returns Mono.just(1L)
 
             // ACT & ASSERT
-            // TODO: Actually test that the quote is liked
             webClient
                 .mutateWith(mockUser(fakeUser))
                 .post()
                 .uri("/quote/$fakeQuoteId/like/toggle")
                 .exchange()
                 .expectStatus().isOk
+
+            verify { userRepository.addLikedQuote(eq(fakeUser.id), eq(fakeQuoteId)) }
         }
 
         test("200 (unlike quote)") {
