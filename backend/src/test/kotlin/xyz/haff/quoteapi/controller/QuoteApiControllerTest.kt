@@ -22,6 +22,7 @@ import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.service.ToggleQuoteLikeService
+import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.testing.TestData
 
 // TODO: Replace all of the Mono.just with mono { }? Does that work?
@@ -38,6 +39,7 @@ class QuoteApiControllerTest(
     @MockkBean private val quoteMapper: QuoteMapper,
     @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder, // Prevents oAuth breakage
     @MockkBean private val userRepository: UserRepository,
+    @MockkBean private val userService: UserService,
     @MockkBean private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : FunSpec({
     val (entity, dto) = TestData.randomQuote
@@ -84,6 +86,7 @@ class QuoteApiControllerTest(
             every { quoteRepository.findById(eq(entity.id!!)) } returns Mono.just(entity)
             every { userRepository.hasLikedQuote(eq(fakeUserId), eq(entity.id!!)) } returns Mono.just(true)
             every { quoteMapper.entityToDto(eq(entity)) } returns dto
+            coEvery { userService.findOrRegisterUser(any()) } returns mockk()
 
             // ACT
             val result = webClient
@@ -252,6 +255,7 @@ class QuoteApiControllerTest(
             val fakeUserId = "63497d171b7c64ed35ce57b7"
             val fakeQuoteId = "63497e3699b55ab8837623aa"
             coEvery { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) } returns true
+            coEvery { userService.findOrRegisterUser(any()) } returns mockk()
 
             // ACT & ASSERT
             webClient

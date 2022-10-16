@@ -14,6 +14,7 @@ import xyz.haff.quoteapi.exception.QuoteNotFoundException
 import xyz.haff.quoteapi.exception.UserNotFoundException
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.service.ToggleQuoteLikeService
+import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.util.getCurrentUserId
 import java.net.URI
 
@@ -22,6 +23,7 @@ class QuoteApiController(
     private val quoteRepository: QuoteRepository,
     private val quoteMapper: QuoteMapper,
     private val userRepository: UserRepository,
+    private val userService: UserService,
     private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : QuoteApi {
 
@@ -29,9 +31,9 @@ class QuoteApiController(
         val quoteEntity = quoteRepository.findById(id).awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
         val quoteDto = quoteMapper.entityToDto(quoteEntity)
 
-        // TODO: A user service that registers a user if they don't exist
         val currentUserId = getCurrentUserId()
         return if (currentUserId != null) {
+            userService.findOrRegisterUser(currentUserId)
             ResponseEntity.ok(quoteDto.copy(
                 liked = userRepository.hasLikedQuote(currentUserId, id).awaitSingle()
             ))
@@ -104,6 +106,7 @@ class QuoteApiController(
     override suspend fun v1ToggleQuoteLike(id: String): ResponseEntity<Unit> {
         val userId = getCurrentUserId()
             ?: return ResponseEntity.status(401).build()
+        userService.findOrRegisterUser(userId)
 
         return try {
             val wasApplied = toggleQuoteLikeService.toggleQuoteLike(userId, id)
