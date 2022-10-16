@@ -5,20 +5,15 @@ import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.ReactiveSecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.RestController
-import reactor.kotlin.extra.bool.not
 import xyz.haff.quoteapi.data.repository.QuoteRepository
-import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.exception.QuoteNotFoundException
 import xyz.haff.quoteapi.exception.UserNotFoundException
 import xyz.haff.quoteapi.mapper.QuoteMapper
-import xyz.haff.quoteapi.security.User
 import xyz.haff.quoteapi.service.ToggleQuoteLikeService
+import xyz.haff.quoteapi.util.getCurrentUserId
 import java.net.URI
 
 @RestController
@@ -29,6 +24,9 @@ class QuoteApiController(
 ) : QuoteApi {
 
     override suspend fun v1GetQuote(id: String): ResponseEntity<QuoteDto> {
+        val userId = getCurrentUserId()
+        // TODO: A user service that registers a user if they don't exist
+
         val quote = quoteRepository.findById(id).awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(quoteMapper.entityToDto(quote))
@@ -96,8 +94,7 @@ class QuoteApiController(
 
     @PreAuthorize("isAuthenticated()")
     override suspend fun v1ToggleQuoteLike(id: String): ResponseEntity<Unit> {
-        val userId = (ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication?.principal as Jwt?)
-            ?.subject
+        val userId = getCurrentUserId()
             ?: return ResponseEntity.status(401).build()
 
         return try {

@@ -19,5 +19,9 @@ Quote:
       description: Tags associated to the quote
       items:
         type: string
+    liked:
+      type: boolean
+      description: Whether this tag was liked by the current user
+      example: true
   required:
     - text

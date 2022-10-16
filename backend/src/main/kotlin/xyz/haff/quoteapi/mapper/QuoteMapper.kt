@@ -10,6 +10,7 @@ import xyz.haff.quoteapi.dto.QuoteDto
 
 @Mapper
 interface QuoteMapper {
+    @Mapping(target = "liked", ignore = true)
     fun entityToDto(entity: QuoteEntity): QuoteDto
 
     @Mapping(target = "id", ignore = true)

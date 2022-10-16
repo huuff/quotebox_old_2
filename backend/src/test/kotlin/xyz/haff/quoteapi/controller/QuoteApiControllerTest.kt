@@ -5,8 +5,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.reactive.awaitSingle
-import org.springframework.boot.autoconfigure.security.oauth2.client.reactive.ReactiveOAuth2ClientAutoConfiguration
-import org.springframework.boot.autoconfigure.security.oauth2.resource.reactive.ReactiveOAuth2ResourceServerAutoConfiguration
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
@@ -20,10 +18,8 @@ import reactor.core.publisher.Mono
 import xyz.haff.quoteapi.config.WebFluxSecurityConfig
 import xyz.haff.quoteapi.data.entity.QuoteEntity
 import xyz.haff.quoteapi.data.repository.QuoteRepository
-import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
-import xyz.haff.quoteapi.security.User
 import xyz.haff.quoteapi.service.ToggleQuoteLikeService
 import xyz.haff.quoteapi.testing.TestData
 

@@ -67,4 +67,20 @@ class UserRepositoryTest(
         userRepository.findById(user.id!!).awaitSingle().likedQuotes.map { it.id } shouldNotContain quoteToRemove.id
     }
 
+    context("hasLikedQuote") {
+        test("true") {
+            userRepository.hasLikedQuote(
+                TestData.userEntity.id!!,
+                TestData.userEntity.likedQuotes[0].id!!
+            ).awaitSingle() shouldBe true
+        }
+
+        test("false") {
+            userRepository.hasLikedQuote(
+                TestData.userEntity.id!!,
+                TestData.quoteNotLikedByUser.id!!
+            ).awaitSingle() shouldBe false
+        }
+    }
+
 })
