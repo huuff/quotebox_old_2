@@ -19,6 +19,7 @@ class QuoteSseController(
 ) {
 
     // TODO: Can I add it to the API? (Maybe AsyncAPI is the only choice)
+    // TODO: Also add the liked field!
     @GetMapping(path = ["/random"], produces = ["application/x-ndjson"])
     fun randomSSE(
         @RequestParam(required = false, defaultValue = "5000") interval: Int,

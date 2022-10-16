@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
+import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.exception.QuoteNotFoundException
@@ -20,16 +21,23 @@ import java.net.URI
 class QuoteApiController(
     private val quoteRepository: QuoteRepository,
     private val quoteMapper: QuoteMapper,
+    private val userRepository: UserRepository,
     private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : QuoteApi {
 
     override suspend fun v1GetQuote(id: String): ResponseEntity<QuoteDto> {
-        val userId = getCurrentUserId()
+        val quoteEntity = quoteRepository.findById(id).awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
+        val quoteDto = quoteMapper.entityToDto(quoteEntity)
+
         // TODO: A user service that registers a user if they don't exist
-
-        val quote = quoteRepository.findById(id).awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
-
-        return ResponseEntity.ok(quoteMapper.entityToDto(quote))
+        val currentUserId = getCurrentUserId()
+        return if (currentUserId != null) {
+            ResponseEntity.ok(quoteDto.copy(
+                liked = userRepository.hasLikedQuote(currentUserId, id).awaitSingle()
+            ))
+        } else {
+            ResponseEntity.ok(quoteDto)
+        }
     }
 
     // TODO: Validations?

@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono
 import xyz.haff.quoteapi.config.WebFluxSecurityConfig
 import xyz.haff.quoteapi.data.entity.QuoteEntity
 import xyz.haff.quoteapi.data.repository.QuoteRepository
+import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.service.ToggleQuoteLikeService
@@ -36,6 +37,7 @@ class QuoteApiControllerTest(
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val quoteMapper: QuoteMapper,
     @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder, // Prevents oAuth breakage
+    @MockkBean private val userRepository: UserRepository,
     @MockkBean private val toggleQuoteLikeService: ToggleQuoteLikeService,
 ) : FunSpec({
     val (entity, dto) = TestData.randomQuote
@@ -74,6 +76,29 @@ class QuoteApiControllerTest(
                 .expectStatus().isNotFound
 
             verify { quoteRepository.findById(entity.id!!) }
+        }
+
+        test("quote is liked") {
+            // ARRANGE
+            val fakeUserId = "634bc7a6e76695732e267491"
+            every { quoteRepository.findById(eq(entity.id!!)) } returns Mono.just(entity)
+            every { userRepository.hasLikedQuote(eq(fakeUserId), eq(entity.id!!)) } returns Mono.just(true)
+            every { quoteMapper.entityToDto(eq(entity)) } returns dto
+
+            // ACT
+            val result = webClient
+                .mutateWith(mockJwt().jwt { it.subject(fakeUserId) })
+                .get()
+                .uri("/quote/${entity.id}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk
+                .returnResult<QuoteDto>()
+                .responseBody
+                .awaitSingle()
+
+            // ASSERT
+            result.liked shouldBe true
         }
     }
 
