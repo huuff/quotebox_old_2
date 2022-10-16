@@ -71,7 +71,7 @@ class WebFluxSecurityConfig {
                 Flux.fromIterable(
                     ((source.claims["realm_access"] as Map<String, Any>)["roles"] as List<String>)
 
-                ).map(::SimpleGrantedAuthority)
+                ).map { SimpleGrantedAuthority("ROLE_${it.uppercase()}") }
             }
 
         val jwtAuthenticationConverter = ReactiveJwtAuthenticationConverter()
