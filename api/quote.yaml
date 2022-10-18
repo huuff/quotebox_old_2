@@ -12,6 +12,7 @@ Quote:
       example: "Thus Spoke Zarathustra"
     text:
       type: string
+      minLength: 10
       description: Contents of quote
       example: "This is a quote"
     tags:

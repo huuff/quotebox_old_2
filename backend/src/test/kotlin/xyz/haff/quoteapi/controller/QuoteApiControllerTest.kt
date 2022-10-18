@@ -5,7 +5,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.reactive.awaitSingle
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
+import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -16,6 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.Mono
 import xyz.haff.quoteapi.config.WebFluxSecurityConfig
+import xyz.haff.quoteapi.config.validation.ValidationConfiguration
 import xyz.haff.quoteapi.data.entity.QuoteEntity
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
@@ -26,13 +29,15 @@ import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.testing.TestData
 
 // TODO: Replace all of the Mono.just with mono { }? Does that work?
+// TODO: Fix validation errors and add a test for these specifically
 @WebFluxTest(
     controllers = [QuoteApiController::class],
     excludeAutoConfiguration = [
         ReactiveSecurityAutoConfiguration::class,
     ],
 )
-@Import(WebFluxSecurityConfig::class)
+@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@Import(WebFluxSecurityConfig::class, ValidationConfiguration::class)
 class QuoteApiControllerTest(
     private val webClient: WebTestClient,
     @MockkBean private val quoteRepository: QuoteRepository,
