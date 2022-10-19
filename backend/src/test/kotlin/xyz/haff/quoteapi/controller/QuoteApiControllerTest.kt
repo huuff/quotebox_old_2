@@ -29,7 +29,7 @@ import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.testing.TestData
 
 // TODO: Replace all of the Mono.just with mono { }? Does that work?
-// TODO: Fix validation errors and add a test for these specifically
+// TODO: Add a test for validations errors
 @WebFluxTest(
     controllers = [QuoteApiController::class],
     excludeAutoConfiguration = [
