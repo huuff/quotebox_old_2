@@ -1,7 +1,7 @@
 package xyz.haff.quoteapi.config.validation
 
 
-//import org.hibernate.validator.internal.engine.DefaultClockProvider
+import org.hibernate.validator.internal.engine.DefaultClockProvider
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer
 import org.springframework.core.PrioritizedParameterNameDiscoverer
 import org.springframework.core.StandardReflectionParameterNameDiscoverer
@@ -23,10 +23,7 @@ import javax.validation.ParameterNameProvider
  *  * Hibernate issue: https://hibernate.atlassian.net/browse/HV-1638
  */
 class CustomLocalValidatorFactoryBean : LocalValidatorFactoryBean() {
-    // TODO: Should use the default one from Hibernate validator whose import is commented out above!
-    override fun getClockProvider(): ClockProvider = ClockProvider {
-        Clock.systemDefaultZone()
-    }
+    override fun getClockProvider(): ClockProvider = DefaultClockProvider.INSTANCE
 
     override fun postProcessConfiguration(configuration: Configuration<*>) {
         super.postProcessConfiguration(configuration)
