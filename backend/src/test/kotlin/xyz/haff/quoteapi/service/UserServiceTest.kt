@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
+import kotlinx.coroutines.reactor.mono
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -24,7 +25,7 @@ class UserServiceTest(
         test("finds") {
             // ARRANGE
             val fakeEntity = UserEntity(id = fakeUserId)
-            every { userRepository.findById(eq(fakeUserId)) } returns Mono.just(fakeEntity)
+            every { userRepository.findById(eq(fakeUserId)) } returns mono { fakeEntity }
 
             // ACT
             val retrieved = userService.findOrRegisterUser(fakeUserId)
@@ -39,7 +40,7 @@ class UserServiceTest(
             // ARRANGE
             val fakeEntity = UserEntity(id = fakeUserId)
             every { userRepository.findById(eq(fakeUserId)) } returns Mono.empty()
-            every { userRepository.insert(eq(fakeEntity)) } returns Mono.just(fakeEntity)
+            every { userRepository.insert(eq(fakeEntity)) } returns mono { fakeEntity }
 
             // ACT
             val saved = userService.findOrRegisterUser(fakeUserId)
@@ -53,7 +54,7 @@ class UserServiceTest(
 
     test("registerUser") {
         // ARRANGE
-        every { userRepository.insert(any<UserEntity>()) } returns Mono.just(mockk())
+        every { userRepository.insert(any<UserEntity>()) } returns mono { mockk() }
 
         // ACT
         userService.registerUser(fakeUserId)

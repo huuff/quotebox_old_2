@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactor.mono
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
@@ -28,7 +29,6 @@ import xyz.haff.quoteapi.service.ToggleQuoteLikeService
 import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.testing.TestData
 
-// TODO: Replace all of the Mono.just with mono { }? Does that work?
 // TODO: Add a test for validations errors
 @WebFluxTest(
     controllers = [QuoteApiController::class],
@@ -52,7 +52,7 @@ class QuoteApiControllerTest(
     context("v1GetQuote") {
         test("200 OK") {
             // ARRANGE
-            every { quoteRepository.findById(any<String>()) } returns Mono.just(entity)
+            every { quoteRepository.findById(any<String>()) } returns mono { entity }
             every { quoteMapper.entityToDto(any()) } returns dto
 
             // ACT
@@ -88,8 +88,8 @@ class QuoteApiControllerTest(
         test("quote is liked") {
             // ARRANGE
             val fakeUserId = "634bc7a6e76695732e267491"
-            every { quoteRepository.findById(eq(entity.id!!)) } returns Mono.just(entity)
-            every { userRepository.hasLikedQuote(eq(fakeUserId), eq(entity.id!!)) } returns Mono.just(true)
+            every { quoteRepository.findById(eq(entity.id!!)) } returns mono { entity }
+            every { userRepository.hasLikedQuote(eq(fakeUserId), eq(entity.id!!)) } returns mono {true }
             every { quoteMapper.entityToDto(eq(entity)) } returns dto
             coEvery { userService.findOrRegisterUser(any()) } returns mockk()
 
@@ -134,7 +134,7 @@ class QuoteApiControllerTest(
         test("201") {
             // ARRANGE
             every { quoteMapper.dtoToEntity(any()) } returns entity
-            every { quoteRepository.insert(eq(entity)) } returns Mono.just(entity)
+            every { quoteRepository.insert(eq(entity)) } returns mono { entity }
 
             // ACT & ASSERT
             webClient
@@ -157,7 +157,7 @@ class QuoteApiControllerTest(
             val mockEntity = mockk<QuoteEntity>(relaxed = true)
             every { quoteRepository.findById(eq(fakeId)) } returns Mono.empty()
             every { quoteMapper.dtoToEntity(eq(dto)) } returns mockEntity
-            every { quoteRepository.insert(any<QuoteEntity>()) } returns Mono.just(mockEntity)
+            every { quoteRepository.insert(any<QuoteEntity>()) } returns mono { mockEntity }
 
             // ACT & ASSERT
             webClient
@@ -181,8 +181,8 @@ class QuoteApiControllerTest(
             // ARRANGE
             val fakeId = "63495ac2eb0bb2a94bb3e512"
             val mockEntity = mockk<QuoteEntity>(relaxed = true)
-            every { quoteRepository.findById(eq(fakeId)) } returns Mono.just(mockEntity)
-            every { quoteRepository.save(any<QuoteEntity>()) } returns Mono.just(mockEntity)
+            every { quoteRepository.findById(eq(fakeId)) } returns mono { mockEntity }
+            every { quoteRepository.save(any<QuoteEntity>()) } returns mono { mockEntity }
 
             // ACT & ASSERT
             webClient
@@ -208,7 +208,7 @@ class QuoteApiControllerTest(
         test("204") {
             // ARRANGE
             val fakeId = "634966b6fd26520899d5b995"
-            every { quoteRepository.existsById(eq(fakeId)) } returns Mono.just(true)
+            every { quoteRepository.existsById(eq(fakeId)) } returns mono { true }
             every { quoteRepository.deleteById(eq(fakeId)) } returns Mono.empty()
 
             // ACT & ASSERT
@@ -225,7 +225,7 @@ class QuoteApiControllerTest(
         test("404") {
             // ARRANGE
             val fakeId = "634967cb5938cee7481268f5"
-            every { quoteRepository.existsById(eq(fakeId)) } returns Mono.just(false)
+            every { quoteRepository.existsById(eq(fakeId)) } returns mono {false }
 
             // ACT & ASSERT
             webClient
@@ -239,7 +239,7 @@ class QuoteApiControllerTest(
 
     test("v1RandomQuote") {
         // ARRANGE
-        every { quoteRepository.getRandom() } returns Mono.just(entity)
+        every { quoteRepository.getRandom() } returns mono { entity }
 
         // ACT & ASSERT
         webClient.get()

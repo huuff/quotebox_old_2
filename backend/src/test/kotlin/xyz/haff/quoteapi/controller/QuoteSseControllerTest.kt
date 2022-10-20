@@ -3,6 +3,7 @@ package xyz.haff.quoteapi.controller
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
+import kotlinx.coroutines.reactor.mono
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -32,7 +33,7 @@ class QuoteSseControllerTest(
         // ARRANGE
         every {
             quoteRepository.getRandom()
-        } returns Mono.just(TestData.quoteEntities[0]) andThen Mono.just(TestData.quoteEntities[1]) andThen Mono.just(TestData.quoteEntities[2])
+        } returns mono { TestData.quoteEntities[0] } andThen mono { TestData.quoteEntities[1] } andThen mono { TestData.quoteEntities[2] }
         every {
             quoteMapper.entityToDto(any())
         } returns TestData.quoteDtos[0] andThen TestData.quoteDtos[1] andThen TestData.quoteDtos[2]
