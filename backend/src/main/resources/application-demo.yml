@@ -9,17 +9,6 @@ spring:
           issuer-uri: http://localhost:8180/auth/realms/quotebox
           jwk-set-uri: http://localhost:8180/auth/realms/quotebox/protocol/openid-connect/certs
 
-      #      client:
-      #        registration:
-      #          keycloak:
-      #            client-id: quotebox-client
-      #            authorization-grant-type: authorization_code
-      #            scope: openid
-      #        provider:
-      #          keycloak:
-      #            issuer-uri: http://localhost:8180/auth/realms/quotebox
-      #            user-name-attribute: preferred_username
-
 logging:
   level:
-    org.springframework.security: DEBUG
+    org.springframework: DEBUG

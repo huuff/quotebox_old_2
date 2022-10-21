@@ -2,9 +2,12 @@ package xyz.haff.quoteapi.controller
 
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import org.springframework.core.codec.DecodingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
@@ -43,7 +46,7 @@ class QuoteApiController(
     }
 
     // TODO: Validations?
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1AddQuote(quoteDto: QuoteDto): ResponseEntity<Unit> {
         val entity = quoteRepository.insert(quoteMapper.dtoToEntity(quoteDto))
             .awaitSingleOrNull() ?: return ResponseEntity.internalServerError().build()
@@ -120,5 +123,11 @@ class QuoteApiController(
         } catch (e: QuoteNotFoundException) {
             ResponseEntity.notFound().build()
         }
+    }
+
+    @ResponseBody
+    @ExceptionHandler(DecodingException::class)
+    suspend fun decodingError(e: DecodingException): ResponseEntity<String> {
+        return ResponseEntity.badRequest().body("TODO: A description of the error here")
     }
 }

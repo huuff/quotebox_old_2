@@ -148,6 +148,27 @@ class QuoteApiControllerTest(
                 .expectHeader()
                 .location("/quote/${entity.id}")
         }
+
+        context("validations") {
+            test("text must not be empty") {
+                // TODO: Make it good
+                val result = webClient
+                    .mutateWith(mockUser().roles("ADMIN"))
+                    .post()
+                    .uri("/quote")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                        {
+                          "author": "test"
+                        }
+                    """.trimIndent())
+                    .exchange()
+                    .expectStatus().isBadRequest
+                    .returnResult<String>()
+
+                println(result)
+            }
+        }
     }
 
     context("v1UpdateQuote") {
