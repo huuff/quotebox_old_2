@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.Reacti
 import org.springframework.security.web.server.SecurityWebFilterChain
 import reactor.core.publisher.Flux
 
-@Profile("!demo")
+@Profile("!nosecurity")
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity(proxyTargetClass = true)

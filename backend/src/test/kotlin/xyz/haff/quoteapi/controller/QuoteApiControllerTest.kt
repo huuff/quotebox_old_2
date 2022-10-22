@@ -24,12 +24,13 @@ import xyz.haff.quoteapi.data.entity.QuoteEntity
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.dto.QuoteDto
+import xyz.haff.quoteapi.dto.ValidationErrorDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.service.ToggleQuoteLikeService
 import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.testing.TestData
+import xyz.haff.quoteapi.util.createValidationError
 
-// TODO: Add a test for validations errors
 @WebFluxTest(
     controllers = [QuoteApiController::class],
     excludeAutoConfiguration = [
@@ -150,9 +151,9 @@ class QuoteApiControllerTest(
         }
 
         context("validations") {
-            test("text must not be empty") {
-                // TODO: Make it good
-                val result = webClient
+            test("text must not be null") {
+                // ACT
+                val error = webClient
                     .mutateWith(mockUser().roles("ADMIN"))
                     .post()
                     .uri("/quote")
@@ -164,9 +165,15 @@ class QuoteApiControllerTest(
                     """.trimIndent())
                     .exchange()
                     .expectStatus().isBadRequest
-                    .returnResult<String>()
+                    .returnResult<ValidationErrorDto>()
+                    .responseBody
+                    .awaitSingle()
 
-                println(result)
+                // ASSERT
+                error shouldBe createValidationError(
+                    path = "text",
+                    type = ValidationErrorDto.Type.MISSING,
+                )
             }
         }
     }

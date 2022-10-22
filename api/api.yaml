@@ -113,3 +113,9 @@ paths:
       responses:
         '201':
           description: Created
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: validation-error.yaml#/ValidationError

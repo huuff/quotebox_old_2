@@ -1,0 +1,27 @@
+ValidationError:
+  type: object
+  description: A description of an error on an input
+  properties:
+    path:
+      type: string
+      description: Path of the parameter on which the validation failed
+      example: text
+    type:
+      type: string
+      enum:
+        - MISSING
+        - MUST_BE_LONGER_THAN
+        - UNKNOWN
+      example: MISSING
+    parameter:
+      type: string
+      description: Optional parameter qualifying the source of the validation error
+      example: 10
+    description:
+      type: string
+      description: Human-readable description of the validation error
+  required:
+    - path
+    - type
+    - description
+

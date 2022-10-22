@@ -14,3 +14,4 @@
 * An integration test for oAuth? Seems like hard
 * Create a new user in the database when a token for a new subject is received
 * Controller advice for handling validation errors
+* Maybe caching headers on responses?
