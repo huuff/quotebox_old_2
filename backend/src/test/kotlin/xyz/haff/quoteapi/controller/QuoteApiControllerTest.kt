@@ -159,11 +159,13 @@ class QuoteApiControllerTest(
                     .post()
                     .uri("/quote")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue("""
+                    .bodyValue(
+                        """
                         {
                           "author": "test"
                         }
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                     .exchange()
                     .expectStatus().isBadRequest
                     .returnResult<ValidationErrorDto>()
@@ -174,6 +176,34 @@ class QuoteApiControllerTest(
                 error shouldBe createValidationError(
                     path = "text",
                     type = ValidationErrorDto.Type.MISSING,
+                )
+            }
+
+            test("text must have at least 10 characters") {
+                // ACT
+                val error = webClient
+                    .mutateWith(mockUser().roles("ADMIN"))
+                    .post()
+                    .uri("/quote")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(
+                        """
+                        {
+                          "text": "short"
+                        }
+                    """.trimIndent()
+                    )
+                    .exchange()
+                    .expectStatus().isBadRequest
+                    .returnResult<ValidationErrorDto>()
+                    .responseBody
+                    .awaitSingle()
+
+                // ASSERT
+                error shouldBe createValidationError(
+                    path = "text",
+                    type = ValidationErrorDto.Type.MUST_BE_LONGER_THAN,
+                    parameter = 10,
                 )
             }
         }
