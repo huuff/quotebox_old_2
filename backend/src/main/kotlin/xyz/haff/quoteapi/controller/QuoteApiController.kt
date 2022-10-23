@@ -1,27 +1,20 @@
 package xyz.haff.quoteapi.controller
 
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
-import org.springframework.core.codec.DecodingException
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
-import xyz.haff.quoteapi.dto.ValidationErrorDto
 import xyz.haff.quoteapi.exception.QuoteNotFoundException
 import xyz.haff.quoteapi.exception.UserNotFoundException
 import xyz.haff.quoteapi.mapper.QuoteMapper
 import xyz.haff.quoteapi.service.ToggleQuoteLikeService
 import xyz.haff.quoteapi.service.UserService
-import xyz.haff.quoteapi.util.createValidationError
 import xyz.haff.quoteapi.util.getCurrentUserId
 import java.net.URI
 
@@ -126,21 +119,5 @@ class QuoteApiController(
         } catch (e: QuoteNotFoundException) {
             ResponseEntity.notFound().build()
         }
-    }
-
-    // TODO: Maybe make it a controller advice
-    // TODO: Also add handler for bean validation
-    @ResponseBody
-    @ExceptionHandler(DecodingException::class)
-    suspend fun decodingError(e: DecodingException): ResponseEntity<ValidationErrorDto> {
-        val result = when (val cause = e.cause) {
-            is MissingKotlinParameterException -> createValidationError(cause.parameter.name!!, ValidationErrorDto.Type.MISSING)
-            else -> createValidationError("unknown", ValidationErrorDto.Type.UNKNOWN)
-        }
-
-        return ResponseEntity
-            .badRequest()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(result)
     }
 }
