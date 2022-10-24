@@ -99,6 +99,14 @@ paths:
           description: A new quote was created
         '204':
           description: The quote was modified
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: validation-error.yaml#/ValidationError
   /quote:
     post:
       summary: Add a new quote
@@ -118,4 +126,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: validation-error.yaml#/ValidationError
+                type: array
+                items:
+                  $ref: validation-error.yaml#/ValidationError
