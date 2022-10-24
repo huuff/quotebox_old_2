@@ -34,10 +34,10 @@ import xyz.haff.quoteapi.util.createValidationError
 @WebFluxTest(
     controllers = [QuoteApiController::class],
     excludeAutoConfiguration = [
-        ReactiveSecurityAutoConfiguration::class,
+        ReactiveSecurityAutoConfiguration::class,  // TODO: Is it necessary?
     ],
 )
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class) // TODO: Is it necessary?
 @Import(WebFluxSecurityConfig::class, ValidationConfiguration::class)
 class QuoteApiControllerTest(
     private val webClient: WebTestClient,
@@ -150,189 +150,130 @@ class QuoteApiControllerTest(
                 .location("/quote/${entity.id}")
         }
 
-        // TODO: In a different test?
-        context("validations") {
-            test("text must not be null") {
-                // ACT
-                val error = webClient
-                    .mutateWith(mockUser().roles("ADMIN"))
-                    .post()
-                    .uri("/quote")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(
-                        """
-                        {
-                          "author": "test"
-                        }
-                    """.trimIndent()
-                    )
-                    .exchange()
-                    .expectStatus().isBadRequest
-                    .returnResult<ValidationErrorDto>()
-                    .responseBody
-                    .awaitSingle()
+        context("v1UpdateQuote") {
+            test("201") {
+                // ARRANGE
+                val fakeId = "63495ac2eb0bb2a94bb3e512"
+                val mockEntity = mockk<QuoteEntity>(relaxed = true)
+                every { quoteRepository.findById(eq(fakeId)) } returns Mono.empty()
+                every { quoteMapper.dtoToEntity(eq(dto)) } returns mockEntity
+                every { quoteRepository.insert(any<QuoteEntity>()) } returns mono { mockEntity }
 
-                // ASSERT
-                error shouldBe createValidationError(
-                    path = "text",
-                    type = ValidationErrorDto.Type.MISSING,
-                )
+                // ACT & ASSERT
+                webClient
+                    .mutateWith(mockUser().roles("ADMIN"))
+                    .put()
+                    .uri("/quote/$fakeId")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Mono.just(dto), QuoteDto::class.java)
+                    .exchange()
+                    .expectStatus().isCreated
+                    .expectHeader()
+                    .location("/quote/$fakeId")
+
+                verify {
+                    mockEntity.id = fakeId
+                    quoteRepository.insert(eq(mockEntity))
+                }
             }
 
-            test("text must have at least 10 characters") {
-                // ACT
-                val error = webClient
-                    .mutateWith(mockUser().roles("ADMIN"))
-                    .post()
-                    .uri("/quote")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(
-                        """
-                        {
-                          "text": "short"
-                        }
-                    """.trimIndent()
-                    )
-                    .exchange()
-                    .expectStatus().isBadRequest
-                    .returnResult<ValidationErrorDto>()
-                    .responseBody
-                    .awaitSingle()
+            test("204") {
+                // ARRANGE
+                val fakeId = "63495ac2eb0bb2a94bb3e512"
+                val mockEntity = mockk<QuoteEntity>(relaxed = true)
+                every { quoteRepository.findById(eq(fakeId)) } returns mono { mockEntity }
+                every { quoteRepository.save(any<QuoteEntity>()) } returns mono { mockEntity }
 
-                // ASSERT
-                error shouldBe createValidationError(
-                    path = "text",
-                    type = ValidationErrorDto.Type.MUST_BE_LONGER_THAN,
-                    parameter = 10,
-                )
+                // ACT & ASSERT
+                webClient
+                    .mutateWith(mockUser().roles("ADMIN"))
+                    .put()
+                    .uri("/quote/$fakeId")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Mono.just(dto), QuoteDto::class.java)
+                    .exchange()
+                    .expectStatus().isNoContent
+
+                verify {
+                    mockEntity.text = dto.text
+                    mockEntity.author = dto.author
+                    mockEntity.tags = dto.tags ?: listOf()
+                    mockEntity.work = dto.work
+                    quoteRepository.save(mockEntity)
+                }
             }
         }
-    }
 
-    context("v1UpdateQuote") {
-        test("201") {
+        context("v1DeleteQuote") {
+            test("204") {
+                // ARRANGE
+                val fakeId = "634966b6fd26520899d5b995"
+                every { quoteRepository.existsById(eq(fakeId)) } returns mono { true }
+                every { quoteRepository.deleteById(eq(fakeId)) } returns Mono.empty()
+
+                // ACT & ASSERT
+                webClient
+                    .mutateWith(mockUser().roles("ADMIN"))
+                    .delete()
+                    .uri("/quote/$fakeId")
+                    .exchange()
+                    .expectStatus().isNoContent
+
+                verify { quoteRepository.deleteById(eq(fakeId)) }
+            }
+
+            test("404") {
+                // ARRANGE
+                val fakeId = "634967cb5938cee7481268f5"
+                every { quoteRepository.existsById(eq(fakeId)) } returns mono { false }
+
+                // ACT & ASSERT
+                webClient
+                    .mutateWith(mockUser().roles("ADMIN"))
+                    .delete()
+                    .uri("/quote/$fakeId")
+                    .exchange()
+                    .expectStatus().isNotFound
+            }
+        }
+
+        test("v1RandomQuote") {
             // ARRANGE
-            val fakeId = "63495ac2eb0bb2a94bb3e512"
-            val mockEntity = mockk<QuoteEntity>(relaxed = true)
-            every { quoteRepository.findById(eq(fakeId)) } returns Mono.empty()
-            every { quoteMapper.dtoToEntity(eq(dto)) } returns mockEntity
-            every { quoteRepository.insert(any<QuoteEntity>()) } returns mono { mockEntity }
+            every { quoteRepository.getRandom() } returns mono { entity }
 
             // ACT & ASSERT
-            webClient
-                .mutateWith(mockUser().roles("ADMIN"))
-                .put()
-                .uri("/quote/$fakeId")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(dto), QuoteDto::class.java)
+            webClient.get()
+                .uri("/quote/random")
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isCreated
+                .expectStatus().isSeeOther
                 .expectHeader()
-                .location("/quote/$fakeId")
+                .location("/quote/${entity.id}")
 
-            verify {
-                mockEntity.id = fakeId
-                quoteRepository.insert(eq(mockEntity))
-            }
+            verify { quoteRepository.getRandom() }
         }
 
-        test("204") {
-            // ARRANGE
-            val fakeId = "63495ac2eb0bb2a94bb3e512"
-            val mockEntity = mockk<QuoteEntity>(relaxed = true)
-            every { quoteRepository.findById(eq(fakeId)) } returns mono { mockEntity }
-            every { quoteRepository.save(any<QuoteEntity>()) } returns mono { mockEntity }
+        context("v1ToggleQuoteLike") {
+            // TODO: Test error cases
+            test("200") {
+                // ARRANGE
+                val fakeUserId = "63497d171b7c64ed35ce57b7"
+                val fakeQuoteId = "63497e3699b55ab8837623aa"
+                coEvery { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) } returns true
+                coEvery { userService.findOrRegisterUser(any()) } returns mockk()
 
-            // ACT & ASSERT
-            webClient
-                .mutateWith(mockUser().roles("ADMIN"))
-                .put()
-                .uri("/quote/$fakeId")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(dto), QuoteDto::class.java)
-                .exchange()
-                .expectStatus().isNoContent
+                // ACT & ASSERT
+                webClient
+                    .mutateWith(mockJwt().jwt {
+                        it.subject(fakeUserId)
+                    })
+                    .post()
+                    .uri("/quote/$fakeQuoteId/like/toggle")
+                    .exchange()
+                    .expectStatus().isOk
 
-            verify {
-                mockEntity.text = dto.text
-                mockEntity.author = dto.author
-                mockEntity.tags = dto.tags ?: listOf()
-                mockEntity.work = dto.work
-                quoteRepository.save(mockEntity)
+                coVerify { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) }
             }
         }
     }
-
-    context("v1DeleteQuote") {
-        test("204") {
-            // ARRANGE
-            val fakeId = "634966b6fd26520899d5b995"
-            every { quoteRepository.existsById(eq(fakeId)) } returns mono { true }
-            every { quoteRepository.deleteById(eq(fakeId)) } returns Mono.empty()
-
-            // ACT & ASSERT
-            webClient
-                .mutateWith(mockUser().roles("ADMIN"))
-                .delete()
-                .uri("/quote/$fakeId")
-                .exchange()
-                .expectStatus().isNoContent
-
-            verify { quoteRepository.deleteById(eq(fakeId)) }
-        }
-
-        test("404") {
-            // ARRANGE
-            val fakeId = "634967cb5938cee7481268f5"
-            every { quoteRepository.existsById(eq(fakeId)) } returns mono {false }
-
-            // ACT & ASSERT
-            webClient
-                .mutateWith(mockUser().roles("ADMIN"))
-                .delete()
-                .uri("/quote/$fakeId")
-                .exchange()
-                .expectStatus().isNotFound
-        }
-    }
-
-    test("v1RandomQuote") {
-        // ARRANGE
-        every { quoteRepository.getRandom() } returns mono { entity }
-
-        // ACT & ASSERT
-        webClient.get()
-            .uri("/quote/random")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus().isSeeOther
-            .expectHeader()
-            .location("/quote/${entity.id}")
-
-        verify { quoteRepository.getRandom() }
-    }
-
-    context("v1ToggleQuoteLike") {
-        // TODO: Test error cases
-        test("200") {
-            // ARRANGE
-            val fakeUserId = "63497d171b7c64ed35ce57b7"
-            val fakeQuoteId = "63497e3699b55ab8837623aa"
-            coEvery { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) } returns true
-            coEvery { userService.findOrRegisterUser(any()) } returns mockk()
-
-            // ACT & ASSERT
-            webClient
-                .mutateWith(mockJwt().jwt {
-                    it.subject(fakeUserId)
-                })
-                .post()
-                .uri("/quote/$fakeQuoteId/like/toggle")
-                .exchange()
-                .expectStatus().isOk
-
-            coVerify { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) }
-        }
-    }
-
 })

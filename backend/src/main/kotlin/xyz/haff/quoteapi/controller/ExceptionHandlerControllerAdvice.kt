@@ -15,8 +15,6 @@ import javax.validation.constraints.Size
 
 @ControllerAdvice
 class ExceptionHandlerControllerAdvice {
-    // TODO: Should return a list of validation errors
-
     @ResponseBody
     @ExceptionHandler(DecodingException::class)
     suspend fun decodingError(e: DecodingException): ResponseEntity<List<ValidationErrorDto>> {
