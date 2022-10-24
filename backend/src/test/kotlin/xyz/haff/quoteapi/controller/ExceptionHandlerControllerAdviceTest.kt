@@ -26,11 +26,7 @@ import xyz.haff.quoteapi.util.createValidationError
 
 @WebFluxTest(
     controllers = [QuoteApiController::class],
-    excludeAutoConfiguration = [
-        ReactiveSecurityAutoConfiguration::class,  // TODO: Is it necessary?
-    ],
 )
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)  // TODO: Is it necessary?
 @Import(WebFluxSecurityConfig::class, ValidationConfiguration::class)
 class ExceptionHandlerControllerAdviceTest(
     private val webClient: WebTestClient,
