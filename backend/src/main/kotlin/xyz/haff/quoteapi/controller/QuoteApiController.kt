@@ -7,13 +7,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import xyz.haff.quoteapi.data.repository.QuoteRepository
-import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.exception.QuoteNotFoundException
 import xyz.haff.quoteapi.exception.UserNotFoundException
 import xyz.haff.quoteapi.mapper.QuoteMapper
-import xyz.haff.quoteapi.service.ToggleQuoteLikeService
+import xyz.haff.quoteapi.service.LikedQuoteService
 import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.util.getCurrentUserId
 import java.net.URI
@@ -22,24 +21,14 @@ import java.net.URI
 class QuoteApiController(
     private val quoteRepository: QuoteRepository,
     private val quoteMapper: QuoteMapper,
-    private val userRepository: UserRepository,
     private val userService: UserService,
-    private val toggleQuoteLikeService: ToggleQuoteLikeService,
+    private val likedQuoteService: LikedQuoteService,
 ) : QuoteApi {
 
     override suspend fun v1GetQuote(id: String): ResponseEntity<QuoteDto> {
-        val quoteEntity = quoteRepository.findById(id).awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
-        val quoteDto = quoteMapper.entityToDto(quoteEntity)
+        val quote = likedQuoteService.findWithLike(id, getCurrentUserId()) ?: return ResponseEntity.notFound().build()
 
-        val currentUserId = getCurrentUserId()
-        return if (currentUserId != null) {
-            userService.findOrRegisterUser(currentUserId)
-            ResponseEntity.ok(quoteDto.copy(
-                liked = userRepository.hasLikedQuote(currentUserId, id).awaitSingle()
-            ))
-        } else {
-            ResponseEntity.ok(quoteDto)
-        }
+        return ResponseEntity.ok(quote)
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -108,7 +97,7 @@ class QuoteApiController(
         userService.findOrRegisterUser(userId)
 
         return try {
-            val wasApplied = toggleQuoteLikeService.toggleQuoteLike(userId, id)
+            val wasApplied = likedQuoteService.toggleLike(userId, id)
             if (wasApplied) {
                 ResponseEntity.ok().build()
             } else {

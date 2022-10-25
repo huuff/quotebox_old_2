@@ -6,9 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.mono
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -24,12 +21,10 @@ import xyz.haff.quoteapi.data.entity.QuoteEntity
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.dto.QuoteDto
-import xyz.haff.quoteapi.dto.ValidationErrorDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
-import xyz.haff.quoteapi.service.ToggleQuoteLikeService
+import xyz.haff.quoteapi.service.LikedQuoteService
 import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.testing.TestData
-import xyz.haff.quoteapi.util.createValidationError
 
 @WebFluxTest(
     controllers = [QuoteApiController::class],
@@ -42,18 +37,19 @@ class QuoteApiControllerTest(
     @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder, // Prevents oAuth breakage
     @MockkBean private val userRepository: UserRepository,
     @MockkBean private val userService: UserService,
-    @MockkBean private val toggleQuoteLikeService: ToggleQuoteLikeService,
+    @MockkBean private val likedQuoteService: LikedQuoteService,
 ) : FunSpec({
     val (entity, dto) = TestData.randomQuote
 
     context("v1GetQuote") {
         test("200 OK") {
             // ARRANGE
-            every { quoteRepository.findById(any<String>()) } returns mono { entity }
-            every { quoteMapper.entityToDto(any()) } returns dto
+            // TODO: eq(null) as second param
+            coEvery { likedQuoteService.findWithLike(eq(entity.id!!), any()) } returns dto
 
             // ACT
-            val response = webClient.get()
+            val response = webClient
+                .get()
                 .uri("/quote/${entity.id}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -64,31 +60,25 @@ class QuoteApiControllerTest(
 
             // ASSERT
             response shouldBe dto
-            verify { quoteRepository.findById(entity.id!!) }
-            verify { quoteMapper.entityToDto(entity) }
         }
 
         test("404 Not Found") {
             // ARRANGE
-            every { quoteRepository.findById(any<String>()) } returns Mono.empty()
+            coEvery { likedQuoteService.findWithLike(eq(entity.id!!), any()) } returns null
 
             // ACT & ASSERT
-            webClient.get()
+            webClient
+                .get()
                 .uri("/quote/${entity.id}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound
-
-            verify { quoteRepository.findById(entity.id!!) }
         }
 
         test("quote is liked") {
             // ARRANGE
             val fakeUserId = "634bc7a6e76695732e267491"
-            every { quoteRepository.findById(eq(entity.id!!)) } returns mono { entity }
-            every { userRepository.hasLikedQuote(eq(fakeUserId), eq(entity.id!!)) } returns mono {true }
-            every { quoteMapper.entityToDto(eq(entity)) } returns dto
-            coEvery { userService.findOrRegisterUser(any()) } returns mockk()
+            coEvery { likedQuoteService.findWithLike(eq(entity.id!!), eq(fakeUserId)) } returns dto.copy(liked = true)
 
             // ACT
             val result = webClient
@@ -255,7 +245,7 @@ class QuoteApiControllerTest(
                 // ARRANGE
                 val fakeUserId = "63497d171b7c64ed35ce57b7"
                 val fakeQuoteId = "63497e3699b55ab8837623aa"
-                coEvery { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) } returns true
+                coEvery { likedQuoteService.toggleLike(eq(fakeUserId), eq(fakeQuoteId)) } returns true
                 coEvery { userService.findOrRegisterUser(any()) } returns mockk()
 
                 // ACT & ASSERT
@@ -268,7 +258,7 @@ class QuoteApiControllerTest(
                     .exchange()
                     .expectStatus().isOk
 
-                coVerify { toggleQuoteLikeService.toggleQuoteLike(eq(fakeUserId), eq(fakeQuoteId)) }
+                coVerify { likedQuoteService.toggleLike(eq(fakeUserId), eq(fakeQuoteId)) }
             }
         }
     }

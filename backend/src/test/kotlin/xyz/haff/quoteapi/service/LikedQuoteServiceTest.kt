@@ -16,13 +16,16 @@ import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.exception.QuoteNotFoundException
 import xyz.haff.quoteapi.exception.UserNotFoundException
+import xyz.haff.quoteapi.mapper.QuoteMapper
 
 @ExtendWith(SpringExtension::class)
-@Import(ToggleQuoteLikeService::class)
-class ToggleQuoteLikeServiceTest(
+@Import(LikedQuoteService::class)
+class LikedQuoteServiceTest(
     @MockkBean private val quoteRepository: QuoteRepository,
     @MockkBean private val userRepository: UserRepository,
-    private val toggleQuoteLikeService: ToggleQuoteLikeService,
+    @MockkBean private val quoteMapper: QuoteMapper,
+    @MockkBean private val userService: UserService,
+    private val likedQuoteService: LikedQuoteService,
 ) : FunSpec({
     val fakeUserId = "634a7c63e11f6ed82e70cc64"
     val fakeQuoteId = "634a7d494f7a0bd42ccf6c59"
@@ -34,7 +37,7 @@ class ToggleQuoteLikeServiceTest(
 
             // ACT & ASSERT
             shouldThrowExactly<UserNotFoundException> {
-                toggleQuoteLikeService.toggleQuoteLike(fakeUserId, fakeQuoteId)
+                likedQuoteService.toggleLike(fakeUserId, fakeQuoteId)
             }
         }
 
@@ -45,7 +48,7 @@ class ToggleQuoteLikeServiceTest(
 
             // ACT & ASSERT
             shouldThrowExactly<QuoteNotFoundException> {
-                toggleQuoteLikeService.toggleQuoteLike(fakeUserId, fakeQuoteId)
+                likedQuoteService.toggleLike(fakeUserId, fakeQuoteId)
             }
         }
 
@@ -59,7 +62,7 @@ class ToggleQuoteLikeServiceTest(
             every { userRepository.addLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns mono  { 1L }
 
             // ACT
-            val wasApplied = toggleQuoteLikeService.toggleQuoteLike(fakeUserId, fakeQuoteId)
+            val wasApplied = likedQuoteService.toggleLike(fakeUserId, fakeQuoteId)
 
             // ASSERT
             wasApplied shouldBe true
@@ -74,11 +77,11 @@ class ToggleQuoteLikeServiceTest(
                     every { id } returns fakeQuoteId
                 })
             }}
-            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono {true }
+            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono { true }
             every { userRepository.removeLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns mono { 1L }
 
             // ACT
-            val wasApplied = toggleQuoteLikeService.toggleQuoteLike(fakeUserId, fakeQuoteId)
+            val wasApplied = likedQuoteService.toggleLike(fakeUserId, fakeQuoteId)
 
             // ASSERT
             wasApplied shouldBe true

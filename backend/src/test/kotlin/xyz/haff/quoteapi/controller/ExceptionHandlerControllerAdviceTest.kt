@@ -4,9 +4,6 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.reactive.awaitSingle
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -20,7 +17,7 @@ import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.UserRepository
 import xyz.haff.quoteapi.dto.ValidationErrorDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
-import xyz.haff.quoteapi.service.ToggleQuoteLikeService
+import xyz.haff.quoteapi.service.LikedQuoteService
 import xyz.haff.quoteapi.service.UserService
 import xyz.haff.quoteapi.util.createValidationError
 
@@ -36,7 +33,7 @@ class ExceptionHandlerControllerAdviceTest(
     @MockkBean private val reactiveJwtDecoder: ReactiveJwtDecoder,
     @MockkBean private val userRepository: UserRepository,
     @MockkBean private val userService: UserService,
-    @MockkBean private val toggleQuoteLikeService: ToggleQuoteLikeService,
+    @MockkBean private val likedQuoteService: LikedQuoteService,
 ) : FunSpec({
 
         test("text must not be null") {
