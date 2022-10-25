@@ -44,8 +44,7 @@ class QuoteApiControllerTest(
     context("v1GetQuote") {
         test("200 OK") {
             // ARRANGE
-            // TODO: eq(null) as second param
-            coEvery { likedQuoteService.findWithLike(eq(entity.id!!), any()) } returns dto
+            coEvery { likedQuoteService.findWithLike(eq(entity.id!!), isNull()) } returns dto
 
             // ACT
             val response = webClient
