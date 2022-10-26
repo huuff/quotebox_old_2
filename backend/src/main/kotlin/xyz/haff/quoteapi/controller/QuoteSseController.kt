@@ -1,11 +1,13 @@
 package xyz.haff.quoteapi.controller
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import reactor.core.publisher.Flux
-import xyz.haff.koy.javatime.millis
 import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
@@ -20,21 +22,19 @@ class QuoteSseController(
 
     // TODO: Can I add it to the API? (Maybe AsyncAPI is the only choice)
     // TODO: Also add the liked field!
-    // TODO: Use Kotlin's Flow instead of Flux?
     @GetMapping(path = ["/random"], produces = ["application/x-ndjson"])
     fun randomSSE(
         @RequestParam(required = false, defaultValue = "5000") interval: Int,
         // XXX: Actually, I only added this because the QuoteSseControllerTest wouldn't work without it
-        @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) count: Long,
+        @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) count: Long, // TODO: As int?
         @RequestParam(required = false) author: String?,
         @RequestParam(required = false) tags: List<String>?,
-    ): Flux<QuoteDto> =
-        quoteRepository
-            .chooseRandom(author, tags)
-            .map(quoteMapper::entityToDto)
-            .concatWith(
-        Flux.interval(interval.millis)
-            .take((count - 1).coerceAtLeast(0))
-            .flatMap { quoteRepository.chooseRandom(author, tags) }
-            .map(quoteMapper::entityToDto))
+    ): Flow<QuoteDto> = flow {
+        repeat(count.toInt()) {
+            val entity = quoteRepository.chooseRandom(author, tags).awaitSingle() // TODO: What if there's none?
+            val dto = quoteMapper.entityToDto(entity)
+            emit(dto)
+            delay(interval.toLong())
+        }
+    }
 }
