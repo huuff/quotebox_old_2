@@ -6,5 +6,8 @@ object MongoOperators {
     const val lookup = "\$lookup"
     const val sample = "\$sample"
     const val all = "\$all"
-
+    const val project = "\$project"
+    const val `in` = "\$in"
+    const val getField = "\$getField"
+    const val first = "\$first"
 }
