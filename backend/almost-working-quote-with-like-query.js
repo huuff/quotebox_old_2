@@ -1,8 +1,6 @@
-// This query almost works to retrieve a quote and wether a given user liked it... but returns the result as an array, with a single object, with an _id field with the value
-
 [{
  $match: {
-  _id: «quote id»
+  _id: ObjectId('6352bf48668a077fda0fd6f5')
  }
 }, {
  $lookup: {
@@ -13,12 +11,13 @@
   pipeline: [
    {
     $match: {
-     _id: «user id»
+     _id: ObjectId('63594c6292e52a5f9156392a')
     }
    },
    {
     $project: {
-     _id: {
+     quote_id: '$$quote_id',
+     liked: {
       $in: [
        '$$quote_id',
        '$liked_quotes'
@@ -27,6 +26,22 @@
     }
    }
   ],
-  as: 'liked'
+  as: 'intermediate_result'
+ }
+}, {
+ $project: {
+  _id: 1,
+  text: 1,
+  author: 1,
+  work: 1,
+  tags: 1,
+  liked: {
+   $getField: {
+    field: 'liked',
+    input: {
+     $first: '$intermediate_result'
+    }
+   }
+  }
  }
 }]
