@@ -33,7 +33,7 @@ class QuoteApiController(
 
     @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1AddQuote(quoteDto: QuoteDto): ResponseEntity<Unit> {
-        val entity = quoteRepository.save(quoteMapper.dtoToEntity(quoteDto)) ?: return ResponseEntity.internalServerError().build()
+        val entity = quoteRepository.save(quoteMapper.dtoToEntity(quoteDto))
 
         return ResponseEntity.created(URI.create("/quote/${entity.id}")).build()
     }
