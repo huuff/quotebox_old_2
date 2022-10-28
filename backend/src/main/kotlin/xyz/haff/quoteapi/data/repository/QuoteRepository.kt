@@ -9,6 +9,7 @@ import xyz.haff.quoteapi.data.entity.QuoteEntity
 import xyz.haff.quoteapi.data.MongoOperators.all
 import xyz.haff.quoteapi.data.MongoOperators.match
 import xyz.haff.quoteapi.data.MongoOperators.sample
+import xyz.haff.quoteapi.dto.QuoteDto
 
 @Repository
 interface QuoteRepository : CoroutineCrudRepository<QuoteEntity, String> {
@@ -48,5 +49,4 @@ interface QuoteRepository : CoroutineCrudRepository<QuoteEntity, String> {
         ]
     )
     suspend fun getRandomByAuthorAndTags(author: String, tags: List<String>): QuoteEntity?
-
 }

@@ -11,6 +11,8 @@ class UserService(
     private val userRepository: UserRepository,
 ) {
 
+    // TODO: Maybe this should be called by Spring Security at the filter level? Otherwise, this method call
+    // is sprinkled all around the code
     /**
      * Since users are managed by the OpenID Connect provider, we just store their OpenID Connect subject when they
      * are first used
