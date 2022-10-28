@@ -4,9 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.reactor.mono
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.context.annotation.Import
@@ -33,7 +31,7 @@ class LikedQuoteServiceTest(
     context("toggleQuoteLike") {
         test("user not found") {
             // ARRANGE
-            every { userRepository.findById(eq(fakeUserId)) } returns Mono.empty()
+            coEvery { userRepository.findById(eq(fakeUserId)) } returns null
 
             // ACT & ASSERT
             shouldThrowExactly<UserNotFoundException> {
@@ -43,7 +41,7 @@ class LikedQuoteServiceTest(
 
         test("quote not found") {
             // ARRANGE
-            every { userRepository.findById(eq(fakeUserId)) } returns mono { mockk() }
+            coEvery { userRepository.findById(eq(fakeUserId)) } returns mockk()
             every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono { false }
 
             // ACT & ASSERT
@@ -54,38 +52,38 @@ class LikedQuoteServiceTest(
 
         test("likes quote") {
             // ARRANGE
-            every { userRepository.findById(eq(fakeUserId)) } returns mono { mockk {
+            coEvery { userRepository.findById(eq(fakeUserId)) } returns mockk {
                 // Has no liked quote
                 every { likedQuotes } returns listOf()
-            }}
+            }
             every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono { true }
-            every { userRepository.addLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns mono  { 1L }
+            coEvery { userRepository.addLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns 1L
 
             // ACT
             val wasApplied = likedQuoteService.toggleLike(fakeUserId, fakeQuoteId)
 
             // ASSERT
             wasApplied shouldBe true
-            verify { userRepository.addLikedQuote(eq(fakeUserId), eq(fakeQuoteId)) }
+            coVerify { userRepository.addLikedQuote(eq(fakeUserId), eq(fakeQuoteId)) }
         }
 
         test("unlikes quote") {
             // ARRANGE
-            every { userRepository.findById(eq(fakeUserId)) } returns mono { mockk {
+            coEvery { userRepository.findById(eq(fakeUserId)) } returns mockk {
                 // Already liked this quote
                 every { likedQuotes } returns listOf(mockk {
                     every { id } returns fakeQuoteId
                 })
-            }}
+            }
             every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono { true }
-            every { userRepository.removeLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns mono { 1L }
+            coEvery { userRepository.removeLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns 1L
 
             // ACT
             val wasApplied = likedQuoteService.toggleLike(fakeUserId, fakeQuoteId)
 
             // ASSERT
             wasApplied shouldBe true
-            verify { userRepository.removeLikedQuote(eq(fakeUserId), eq(fakeQuoteId)) }
+            coVerify { userRepository.removeLikedQuote(eq(fakeUserId), eq(fakeQuoteId)) }
         }
     }
 })

@@ -16,8 +16,8 @@ class UserService(
      * are first used
      */
     suspend fun findOrRegisterUser(userId: String): UserEntity
-        = userRepository.findById(userId).awaitSingleOrNull() ?: registerUser(userId)
+        = userRepository.findById(userId) ?: registerUser(userId)
 
     suspend fun registerUser(userId: String): UserEntity
-        = userRepository.insert(UserEntity(id = userId)).awaitSingle()
+        = userRepository.save(UserEntity(id = userId))
 }

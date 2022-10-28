@@ -25,42 +25,42 @@ class UserServiceTest(
         test("finds") {
             // ARRANGE
             val fakeEntity = UserEntity(id = fakeUserId)
-            every { userRepository.findById(eq(fakeUserId)) } returns mono { fakeEntity }
+            coEvery { userRepository.findById(eq(fakeUserId)) } returns fakeEntity
 
             // ACT
             val retrieved = userService.findOrRegisterUser(fakeUserId)
 
             // ASSERT
-            verify { userRepository.findById(eq(fakeUserId)) }
-            verify { userRepository.insert(eq(fakeEntity)) wasNot called }
+            coVerify { userRepository.findById(eq(fakeUserId)) }
+            coVerify { userRepository.save(eq(fakeEntity)) wasNot called }
             retrieved shouldBe fakeEntity
         }
 
         test("doesn't find") {
             // ARRANGE
             val fakeEntity = UserEntity(id = fakeUserId)
-            every { userRepository.findById(eq(fakeUserId)) } returns Mono.empty()
-            every { userRepository.insert(eq(fakeEntity)) } returns mono { fakeEntity }
+            coEvery { userRepository.findById(eq(fakeUserId)) } returns null
+            coEvery { userRepository.save(eq(fakeEntity)) } returns fakeEntity
 
             // ACT
             val saved = userService.findOrRegisterUser(fakeUserId)
 
             // ASSERT
-            verify { userRepository.findById(eq(fakeUserId)) }
-            verify { userRepository.insert(eq(fakeEntity)) }
+            coVerify { userRepository.findById(eq(fakeUserId)) }
+            coVerify { userRepository.save(eq(fakeEntity)) }
             saved shouldBe fakeEntity
         }
     }
 
     test("registerUser") {
         // ARRANGE
-        every { userRepository.insert(any<UserEntity>()) } returns mono { mockk() }
+        coEvery { userRepository.save(any()) } returns mockk()
 
         // ACT
         userService.registerUser(fakeUserId)
 
         // ASSERT
-        verify { userRepository.insert(withArg<UserEntity> {
+        coVerify { userRepository.save(withArg {
             it.id shouldBe fakeUserId
         }) }
     }

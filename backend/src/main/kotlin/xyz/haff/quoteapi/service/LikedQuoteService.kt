@@ -21,7 +21,7 @@ class LikedQuoteService(
     // TODO: Maybe should be transactional?
     // TODO: So many queries... this can't be performant!
     suspend fun toggleLike(userId: String, quoteId: String): Boolean {
-        val userEntity = userRepository.findById(userId).awaitSingleOrNull()
+        val userEntity = userRepository.findById(userId)
             ?: throw UserNotFoundException(userId)
 
         if (!quoteRepository.existsById(quoteId).awaitSingle()) {
@@ -34,7 +34,7 @@ class LikedQuoteService(
             userRepository.addLikedQuote(userId, quoteId)
         } else {
             userRepository.removeLikedQuote(userId, quoteId)
-        }.awaitSingle()
+        }
 
         return modifiedCount == 1L
     }
@@ -48,7 +48,7 @@ class LikedQuoteService(
         return if (userId != null) {
             userService.findOrRegisterUser(userId)
             quoteDto.copy(
-                liked = userRepository.hasLikedQuote(quoteId, userId).awaitSingle()
+                liked = userRepository.hasLikedQuote(quoteId, userId)
             )
         } else {
             quoteDto
