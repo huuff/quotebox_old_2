@@ -8,7 +8,6 @@
 * Retrieving quotes liked by a user like:
   * By params, and paged
   * Randomly and by params
-* Return whether a quote is liked in the `QuoteDto`
 * Add kover
 * An integration test for oAuth? Seems like hard
 * Maybe caching headers on responses?
