@@ -10,4 +10,6 @@ object MongoOperators {
     const val `in` = "\$in"
     const val getField = "\$getField"
     const val first = "\$first"
+    const val addToSet = "\$addToSet"
+    const val pull = "\$pull"
 }
