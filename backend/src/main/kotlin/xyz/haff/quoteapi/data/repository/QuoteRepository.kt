@@ -2,6 +2,7 @@ package xyz.haff.quoteapi.data.repository
 
 import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 import xyz.haff.quoteapi.data.entity.QuoteEntity
@@ -10,14 +11,14 @@ import xyz.haff.quoteapi.data.MongoOperators.match
 import xyz.haff.quoteapi.data.MongoOperators.sample
 
 @Repository
-interface QuoteRepository : ReactiveMongoRepository<QuoteEntity, String> {
+interface QuoteRepository : CoroutineCrudRepository<QuoteEntity, String> {
 
     @Aggregation(
         pipeline = [
             "{ '$sample':  { size:  1 } }",
         ]
     )
-    fun getRandom(): Mono<QuoteEntity>
+    suspend fun getRandom(): QuoteEntity
 
     @Aggregation(
         pipeline = [
@@ -25,7 +26,7 @@ interface QuoteRepository : ReactiveMongoRepository<QuoteEntity, String> {
             "{ '$sample':  { size:  1 } }",
         ]
     )
-    fun getRandomByAuthor(author: String): Mono<QuoteEntity>
+    suspend fun getRandomByAuthor(author: String): QuoteEntity?
 
     @Aggregation(
         pipeline = [
@@ -33,7 +34,7 @@ interface QuoteRepository : ReactiveMongoRepository<QuoteEntity, String> {
             "{ '$sample':  { size:  1 } }",
         ]
     )
-    fun getRandomByTags(tags: List<String>): Mono<QuoteEntity>
+    suspend fun getRandomByTags(tags: List<String>): QuoteEntity?
 
     @Aggregation(
         pipeline = [
@@ -46,6 +47,6 @@ interface QuoteRepository : ReactiveMongoRepository<QuoteEntity, String> {
             "{ '$sample':  { size:  1 } }",
         ]
     )
-    fun getRandomByAuthorAndTags(author: String, tags: List<String>): Mono<QuoteEntity>
+    suspend fun getRandomByAuthorAndTags(author: String, tags: List<String>): QuoteEntity?
 
 }

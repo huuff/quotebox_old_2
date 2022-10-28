@@ -2,6 +2,7 @@ package xyz.haff.quoteapi.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
+import io.mockk.coEvery
 import io.mockk.every
 import kotlinx.coroutines.reactor.mono
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
@@ -31,9 +32,9 @@ class QuoteSseControllerTest(
 
     test("randomSSE") {
         // ARRANGE
-        every {
+        coEvery {
             quoteRepository.getRandom()
-        } returns mono { TestData.quoteEntities[0] } andThen mono { TestData.quoteEntities[1] } andThen mono { TestData.quoteEntities[2] }
+        } returns TestData.quoteEntities[0] andThen TestData.quoteEntities[1] andThen TestData.quoteEntities[2]
         every {
             quoteMapper.entityToDto(any())
         } returns TestData.quoteDtos[0] andThen TestData.quoteDtos[1] andThen TestData.quoteDtos[2]

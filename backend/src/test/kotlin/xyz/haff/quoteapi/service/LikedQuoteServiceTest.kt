@@ -42,7 +42,7 @@ class LikedQuoteServiceTest(
         test("quote not found") {
             // ARRANGE
             coEvery { userRepository.findById(eq(fakeUserId)) } returns mockk()
-            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono { false }
+            coEvery { quoteRepository.existsById(eq(fakeQuoteId)) } returns false
 
             // ACT & ASSERT
             shouldThrowExactly<QuoteNotFoundException> {
@@ -56,7 +56,7 @@ class LikedQuoteServiceTest(
                 // Has no liked quote
                 every { likedQuotes } returns listOf()
             }
-            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono { true }
+            coEvery { quoteRepository.existsById(eq(fakeQuoteId)) } returns true
             coEvery { userRepository.addLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns 1L
 
             // ACT
@@ -75,7 +75,7 @@ class LikedQuoteServiceTest(
                     every { id } returns fakeQuoteId
                 })
             }
-            every { quoteRepository.existsById(eq(fakeQuoteId)) } returns mono { true }
+            coEvery { quoteRepository.existsById(eq(fakeQuoteId)) } returns true
             coEvery { userRepository.removeLikedQuote(eq(fakeUserId), eq(fakeQuoteId))} returns 1L
 
             // ACT

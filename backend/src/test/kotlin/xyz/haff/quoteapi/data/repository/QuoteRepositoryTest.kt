@@ -26,15 +26,15 @@ class QuoteRepositoryTest(
     test("save and find") {
         val quote = QuoteEntity(author = "Author", text = "Text")
 
-        val savedQuote = quoteRepository.save(quote).awaitSingle()
-        val retrievedQuote = quoteRepository.findById(savedQuote.id!!).awaitSingle()
+        val savedQuote = quoteRepository.save(quote)
+        val retrievedQuote = quoteRepository.findById(savedQuote.id!!)
 
         retrievedQuote shouldBe savedQuote
     }
 
     context("random") {
         test("getRandom") {
-            quoteRepository.getRandom().awaitSingle() shouldBeIn TestData.quoteEntities
+            quoteRepository.getRandom() shouldBeIn TestData.quoteEntities
         }
 
         test("getRandomByAuthor") {
@@ -42,7 +42,7 @@ class QuoteRepositoryTest(
             val author = TestData.randomQuote.entity.author!!
 
             // ACT
-            val quote = quoteRepository.getRandomByAuthor(author).awaitSingle()
+            val quote = quoteRepository.getRandomByAuthor(author)!!
 
             // ASSERT
             quote shouldBeIn TestData.quoteEntities
@@ -54,7 +54,7 @@ class QuoteRepositoryTest(
             val tags = TestData.randomQuote.entity.tags
 
             // ACT
-            val quote = quoteRepository.getRandomByTags(tags).awaitSingle()
+            val quote = quoteRepository.getRandomByTags(tags)!!
 
             // ASSERT
             quote shouldBeIn TestData.quoteEntities
@@ -66,7 +66,7 @@ class QuoteRepositoryTest(
             val (_, _, author, _, tags) = TestData.randomQuote.entity
 
             // ACT
-            val quote = quoteRepository.getRandomByAuthorAndTags(author!!, tags).awaitSingle()
+            val quote = quoteRepository.getRandomByAuthorAndTags(author!!, tags)!!
 
             // ASSERT
             quote shouldBeIn TestData.quoteEntities

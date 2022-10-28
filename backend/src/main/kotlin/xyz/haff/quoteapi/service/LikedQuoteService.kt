@@ -24,7 +24,7 @@ class LikedQuoteService(
         val userEntity = userRepository.findById(userId)
             ?: throw UserNotFoundException(userId)
 
-        if (!quoteRepository.existsById(quoteId).awaitSingle()) {
+        if (!quoteRepository.existsById(quoteId)) {
             throw QuoteNotFoundException(quoteId)
         }
 
@@ -42,7 +42,7 @@ class LikedQuoteService(
     // TODO: Transactional?
     // TODO: Test
     suspend fun findWithLike(quoteId: String, userId: String?): QuoteDto? {
-        val quoteEntity = quoteRepository.findById(quoteId).awaitSingleOrNull() ?: return null
+        val quoteEntity = quoteRepository.findById(quoteId) ?: return null
         val quoteDto = quoteMapper.entityToDto(quoteEntity)
 
         return if (userId != null) {

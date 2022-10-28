@@ -119,8 +119,8 @@ class QuoteApiControllerTest(
 
         test("201") {
             // ARRANGE
-            every { quoteMapper.dtoToEntity(any()) } returns entity
-            every { quoteRepository.insert(eq(entity)) } returns mono { entity }
+            coEvery { quoteMapper.dtoToEntity(any()) } returns entity
+            coEvery { quoteRepository.save(eq(entity)) } returns entity
 
             // ACT & ASSERT
             webClient
@@ -140,9 +140,9 @@ class QuoteApiControllerTest(
                 // ARRANGE
                 val fakeId = "63495ac2eb0bb2a94bb3e512"
                 val mockEntity = mockk<QuoteEntity>(relaxed = true)
-                every { quoteRepository.findById(eq(fakeId)) } returns Mono.empty()
-                every { quoteMapper.dtoToEntity(eq(dto)) } returns mockEntity
-                every { quoteRepository.insert(any<QuoteEntity>()) } returns mono { mockEntity }
+                coEvery { quoteRepository.findById(eq(fakeId)) } returns null
+                coEvery { quoteMapper.dtoToEntity(eq(dto)) } returns mockEntity
+                coEvery { quoteRepository.save(any<QuoteEntity>()) } returns mockEntity
 
                 // ACT & ASSERT
                 webClient
@@ -156,9 +156,9 @@ class QuoteApiControllerTest(
                     .expectHeader()
                     .location("/quote/$fakeId")
 
-                verify {
+                coVerify {
                     mockEntity.id = fakeId
-                    quoteRepository.insert(eq(mockEntity))
+                    quoteRepository.save(eq(mockEntity))
                 }
             }
 
@@ -166,8 +166,8 @@ class QuoteApiControllerTest(
                 // ARRANGE
                 val fakeId = "63495ac2eb0bb2a94bb3e512"
                 val mockEntity = mockk<QuoteEntity>(relaxed = true)
-                every { quoteRepository.findById(eq(fakeId)) } returns mono { mockEntity }
-                every { quoteRepository.save(any<QuoteEntity>()) } returns mono { mockEntity }
+                coEvery { quoteRepository.findById(eq(fakeId)) } returns mockEntity
+                coEvery { quoteRepository.save(any()) } returns mockEntity
 
                 // ACT & ASSERT
                 webClient
@@ -179,7 +179,7 @@ class QuoteApiControllerTest(
                     .exchange()
                     .expectStatus().isNoContent
 
-                verify {
+                coVerify {
                     mockEntity.text = dto.text
                     mockEntity.author = dto.author
                     mockEntity.tags = dto.tags ?: listOf()
@@ -193,8 +193,8 @@ class QuoteApiControllerTest(
             test("204") {
                 // ARRANGE
                 val fakeId = "634966b6fd26520899d5b995"
-                every { quoteRepository.existsById(eq(fakeId)) } returns mono { true }
-                every { quoteRepository.deleteById(eq(fakeId)) } returns Mono.empty()
+                coEvery { quoteRepository.existsById(eq(fakeId)) } returns true
+                coEvery { quoteRepository.deleteById(eq(fakeId)) } just runs
 
                 // ACT & ASSERT
                 webClient
@@ -204,13 +204,13 @@ class QuoteApiControllerTest(
                     .exchange()
                     .expectStatus().isNoContent
 
-                verify { quoteRepository.deleteById(eq(fakeId)) }
+                coVerify { quoteRepository.deleteById(eq(fakeId)) }
             }
 
             test("404") {
                 // ARRANGE
                 val fakeId = "634967cb5938cee7481268f5"
-                every { quoteRepository.existsById(eq(fakeId)) } returns mono { false }
+                coEvery { quoteRepository.existsById(eq(fakeId)) } returns false
 
                 // ACT & ASSERT
                 webClient
@@ -224,7 +224,7 @@ class QuoteApiControllerTest(
 
         test("v1RandomQuote") {
             // ARRANGE
-            every { quoteRepository.getRandom() } returns mono { entity }
+            coEvery { quoteRepository.getRandom() } returns entity
 
             // ACT & ASSERT
             webClient.get()
@@ -235,7 +235,7 @@ class QuoteApiControllerTest(
                 .expectHeader()
                 .location("/quote/${entity.id}")
 
-            verify { quoteRepository.getRandom() }
+            coVerify { quoteRepository.getRandom() }
         }
 
         context("v1ToggleQuoteLike") {

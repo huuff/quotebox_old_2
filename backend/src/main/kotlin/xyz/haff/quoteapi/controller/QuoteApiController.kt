@@ -33,8 +33,7 @@ class QuoteApiController(
 
     @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1AddQuote(quoteDto: QuoteDto): ResponseEntity<Unit> {
-        val entity = quoteRepository.insert(quoteMapper.dtoToEntity(quoteDto))
-            .awaitSingleOrNull() ?: return ResponseEntity.internalServerError().build()
+        val entity = quoteRepository.save(quoteMapper.dtoToEntity(quoteDto)) ?: return ResponseEntity.internalServerError().build()
 
         return ResponseEntity.created(URI.create("/quote/${entity.id}")).build()
     }
@@ -42,7 +41,7 @@ class QuoteApiController(
     // TODO: Maybe should be transactional?
     @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1UpdateQuote(id: String, quoteDto: QuoteDto): ResponseEntity<Unit> {
-        val existingEntity = quoteRepository.findById(id).awaitSingleOrNull()
+        val existingEntity = quoteRepository.findById(id)
 
         if (existingEntity != null) {
             existingEntity.apply {
@@ -51,12 +50,12 @@ class QuoteApiController(
                 tags = quoteDto.tags ?: listOf()
                 work = quoteDto.work
             }
-            quoteRepository.save(existingEntity).awaitSingleOrNull()
+            quoteRepository.save(existingEntity)
 
             return ResponseEntity.noContent().build()
         } else {
             val newEntity = quoteMapper.dtoToEntity(quoteDto).apply { this.id = id }
-            quoteRepository.insert(newEntity).awaitSingleOrNull()
+            quoteRepository.save(newEntity)
 
             return ResponseEntity.created(URI.create("/quote/${id}")).build()
         }
@@ -65,11 +64,11 @@ class QuoteApiController(
     // TODO: Maybe should be transactional?
     @PreAuthorize("hasRole('ADMIN')")
     override suspend fun v1DeleteQuote(id: String): ResponseEntity<Unit> {
-        if (!quoteRepository.existsById(id).awaitSingle()) {
+        if (!quoteRepository.existsById(id)) {
             return ResponseEntity.notFound().build()
         }
 
-        quoteRepository.deleteById(id).awaitSingleOrNull()
+        quoteRepository.deleteById(id)
         return ResponseEntity.noContent().build()
     }
 
@@ -81,7 +80,7 @@ class QuoteApiController(
             quoteRepository.chooseRandom(author, tags)
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.badRequest().build()
-        }.awaitSingleOrNull() ?: return ResponseEntity.notFound().build()
+        } ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity
             .status(HttpStatus.SEE_OTHER)
