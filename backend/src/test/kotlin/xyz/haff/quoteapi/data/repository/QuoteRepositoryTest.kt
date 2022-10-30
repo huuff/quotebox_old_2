@@ -75,4 +75,24 @@ class QuoteRepositoryTest(
         }
     }
 
+    context("with like status") {
+        test("finds liked") {
+            val userEntity = TestData.userEntity
+            val quoteEntity = TestData.userEntity.likedQuotes[0]
+
+            val quoteDto = quoteRepository.findWithLikeStatus(quoteEntity.id!!, userEntity.id!!)
+
+            quoteDto!!.liked shouldBe true
+        }
+
+        test("find not liked") {
+            val userEntity = TestData.userEntity
+            val quoteEntity = TestData.quoteNotLikedByUser
+
+            val quoteDto = quoteRepository.findWithLikeStatus(quoteEntity.id!!, userEntity.id!!)
+
+            quoteDto!!.liked shouldBe false
+        }
+    }
+
 })
