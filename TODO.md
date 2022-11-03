@@ -12,5 +12,4 @@
 * An integration test for oAuth? Seems like hard
 * Maybe caching headers on responses?
 * Add a nice amount of starting quotes
-* Try to use named params for repositories (i.e. `:id` instead of `?0`)
 * Add indexes
