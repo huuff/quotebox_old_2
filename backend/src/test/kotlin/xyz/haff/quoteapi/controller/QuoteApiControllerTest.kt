@@ -224,7 +224,7 @@ class QuoteApiControllerTest(
 
         test("v1RandomQuote") {
             // ARRANGE
-            coEvery { quoteRepository.getRandom() } returns entity
+            coEvery { quoteRepository.getRandomId() } returns entity.id!!
 
             // ACT & ASSERT
             webClient.get()
@@ -235,7 +235,7 @@ class QuoteApiControllerTest(
                 .expectHeader()
                 .location("/quote/${entity.id}")
 
-            coVerify { quoteRepository.getRandom() }
+            coVerify { quoteRepository.getRandomId() }
         }
 
         context("v1ToggleQuoteLike") {

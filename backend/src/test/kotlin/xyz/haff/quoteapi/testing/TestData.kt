@@ -33,4 +33,6 @@ object TestData {
             dto = quoteDtos[index],
         )
     }
+
+    fun findQuote(id: String) = quoteEntities.find { it.id == id }
 }

@@ -31,7 +31,9 @@ class QuoteSseController(
         @RequestParam(required = false) tags: List<String>?,
     ): Flow<QuoteDto> = flow {
         repeat(count.toInt()) {
-            val entity = quoteRepository.chooseRandom(author, tags)!! // TODO: What if there's none?
+            // TODO: These following two operations should be transactional
+            val randomId = quoteRepository.chooseRandom(author, tags)!! // TODO: What if there's none?
+            val entity = quoteRepository.findById(randomId)!!
             val dto = quoteMapper.entityToDto(entity)
             emit(dto)
             delay(interval.toLong())

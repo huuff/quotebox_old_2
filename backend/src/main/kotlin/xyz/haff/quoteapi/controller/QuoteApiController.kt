@@ -1,7 +1,5 @@
 package xyz.haff.quoteapi.controller
 
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -73,7 +71,7 @@ class QuoteApiController(
     }
 
     override suspend fun v1RandomQuote(author: String?, tags: List<String>?): ResponseEntity<Unit> {
-        val quoteEntity = try {
+        val quoteId = try {
             // MAYBE: A repository method that returns a random ID instead of a random entity? Otherwise, it might be
             // wasteful since the response is a redirect to that entity...
             // Alternatively: cache it with JPA's cache
@@ -84,7 +82,7 @@ class QuoteApiController(
 
         return ResponseEntity
             .status(HttpStatus.SEE_OTHER)
-            .location(URI.create("/quote/${quoteEntity.id}"))
+            .location(URI.create("/quote/${quoteId}"))
             .build()
     }
 

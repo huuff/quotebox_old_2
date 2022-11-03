@@ -21,25 +21,28 @@ interface QuoteRepository : CoroutineCrudRepository<QuoteEntity, String> {
     @Aggregation(
         pipeline = [
             "{ '$sample':  { size:  1 } }",
+            "{ '$project':  { _id:  1 } }",
         ]
     )
-    suspend fun getRandom(): QuoteEntity
+    suspend fun getRandomId(): String
 
     @Aggregation(
         pipeline = [
             "{ '$match':  { author: '?0' }}",
             "{ '$sample':  { size:  1 } }",
+            "{ '$project':  { _id:  1 } }",
         ]
     )
-    suspend fun getRandomByAuthor(author: String): QuoteEntity?
+    suspend fun getRandomIdByAuthor(author: String): String?
 
     @Aggregation(
         pipeline = [
             "{ '$match':  { tags: {'$all': [?0] }}}",
             "{ '$sample':  { size:  1 } }",
+            "{ '$project':  { _id:  1 } }",
         ]
     )
-    suspend fun getRandomByTags(tags: List<String>): QuoteEntity?
+    suspend fun getRandomIdByTags(tags: List<String>): String?
 
     @Aggregation(
         pipeline = [
@@ -50,9 +53,10 @@ interface QuoteRepository : CoroutineCrudRepository<QuoteEntity, String> {
             }
         """,
             "{ '$sample':  { size:  1 } }",
+            "{ '$project':  { _id:  1 } }",
         ]
     )
-    suspend fun getRandomByAuthorAndTags(author: String, tags: List<String>): QuoteEntity?
+    suspend fun getRandomIdByAuthorAndTags(author: String, tags: List<String>): String?
 
     // TODO: Use it where appropriate
     @Aggregation(

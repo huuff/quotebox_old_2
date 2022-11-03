@@ -2,6 +2,7 @@ package xyz.haff.quoteapi.data.repository
 
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
@@ -34,7 +35,7 @@ class QuoteRepositoryTest(
 
     context("random") {
         test("getRandom") {
-            quoteRepository.getRandom() shouldBeIn TestData.quoteEntities
+            quoteRepository.getRandomId() shouldBeIn TestData.quoteEntities.map { it.id }
         }
 
         test("getRandomByAuthor") {
@@ -42,10 +43,11 @@ class QuoteRepositoryTest(
             val author = TestData.randomQuote.entity.author!!
 
             // ACT
-            val quote = quoteRepository.getRandomByAuthor(author)!!
+            val quoteId = quoteRepository.getRandomIdByAuthor(author)!!
 
             // ASSERT
-            quote shouldBeIn TestData.quoteEntities
+            val quote = TestData.findQuote(quoteId)
+            quote.shouldNotBeNull()
             quote.author shouldBe author
         }
 
@@ -54,10 +56,11 @@ class QuoteRepositoryTest(
             val tags = TestData.randomQuote.entity.tags
 
             // ACT
-            val quote = quoteRepository.getRandomByTags(tags)!!
+            val quoteId = quoteRepository.getRandomIdByTags(tags)!!
 
             // ASSERT
-            quote shouldBeIn TestData.quoteEntities
+            val quote = TestData.findQuote(quoteId)
+            quote.shouldNotBeNull()
             quote.tags shouldContainExactly tags
         }
 
@@ -66,10 +69,11 @@ class QuoteRepositoryTest(
             val (_, _, author, _, tags) = TestData.randomQuote.entity
 
             // ACT
-            val quote = quoteRepository.getRandomByAuthorAndTags(author!!, tags)!!
+            val quoteId = quoteRepository.getRandomIdByAuthorAndTags(author!!, tags)!!
 
             // ASSERT
-            quote shouldBeIn TestData.quoteEntities
+            val quote = TestData.findQuote(quoteId)
+            quote.shouldNotBeNull()
             quote.tags shouldContainExactly tags
             quote.author shouldBe author
         }

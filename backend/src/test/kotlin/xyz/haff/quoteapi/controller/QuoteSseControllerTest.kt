@@ -33,7 +33,10 @@ class QuoteSseControllerTest(
     test("randomSSE") {
         // ARRANGE
         coEvery {
-            quoteRepository.getRandom()
+            quoteRepository.getRandomId()
+        } returns TestData.quoteEntities[0].id!! andThen TestData.quoteEntities[1].id!! andThen TestData.quoteEntities[2].id!!
+        coEvery {
+            quoteRepository.findById(any())
         } returns TestData.quoteEntities[0] andThen TestData.quoteEntities[1] andThen TestData.quoteEntities[2]
         every {
             quoteMapper.entityToDto(any())
