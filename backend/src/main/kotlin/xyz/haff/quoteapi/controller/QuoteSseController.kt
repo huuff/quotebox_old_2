@@ -12,6 +12,7 @@ import xyz.haff.quoteapi.data.repository.QuoteRepository
 import xyz.haff.quoteapi.data.repository.chooseRandom
 import xyz.haff.quoteapi.dto.QuoteDto
 import xyz.haff.quoteapi.mapper.QuoteMapper
+import xyz.haff.quoteapi.util.getCurrentUserId
 
 @RequestMapping("/sse/quote")
 @RestController
@@ -20,8 +21,7 @@ class QuoteSseController(
     private val quoteMapper: QuoteMapper,
 ) {
 
-    // TODO: Can I add it to the API? (Maybe AsyncAPI is the only choice)
-    // TODO: Also add the liked field!
+    // TODO: Test liked quotes
     @GetMapping(path = ["/random"], produces = ["application/x-ndjson"])
     fun randomSSE(
         @RequestParam(required = false, defaultValue = "5000") interval: Int,
@@ -30,12 +30,20 @@ class QuoteSseController(
         @RequestParam(required = false) author: String?,
         @RequestParam(required = false) tags: List<String>?,
     ): Flow<QuoteDto> = flow {
+        val userId = getCurrentUserId()
+
         repeat(count.toInt()) {
-            // TODO: These following two operations should be transactional
+            // TODO: These following two operations should be transactional, maybe in a service that find a random quote with like status
             val randomId = quoteRepository.chooseRandom(author, tags)!! // TODO: What if there's none?
-            val entity = quoteRepository.findById(randomId)!!
-            val dto = quoteMapper.entityToDto(entity)
-            emit(dto)
+
+            if (userId != null) {
+                emit(quoteRepository.findWithLikeStatus(randomId, userId)!!)
+            } else {
+                val entity = quoteRepository.findById(randomId)!!
+                val dto = quoteMapper.entityToDto(entity)
+                emit(dto)
+            }
+
             delay(interval.toLong())
         }
     }
