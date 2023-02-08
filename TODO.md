@@ -13,3 +13,4 @@
 * Maybe caching headers on responses?
 * Add a nice amount of starting quotes
 * Add indexes
+* Make entity properties `val` since I discovered it's valid for sprign data mongodb
